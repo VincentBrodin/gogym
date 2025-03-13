@@ -16,6 +16,56 @@ type AddWorkoutForm struct {
 	Note *string `form:"note"`
 }
 
+func GetAllWorkouts(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+
+	workouts := make([]*models.Workout, 0)
+	if err := db.Preload("Exercises").Where("user_id = ?", claims.ID).Find(&workouts).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	wResponses := make([]models.WorkoutResponse, len(workouts))
+
+	for i, workout := range workouts {
+		wResponse := models.WorkoutResponse{
+			ID: workout.ID,
+
+			Name: workout.Name,
+			Note: workout.Note,
+
+			LastDone:  workout.LastDone,
+			CreatedAt: workout.CreatedAt,
+			UpdatedAt: workout.UpdatedAt,
+			Exercises: make([]models.ExerciseResponse, 0),
+		}
+
+		for _, exercise := range workout.Exercises {
+			eResponse := models.ExerciseResponse{
+				ID:        exercise.ID,
+				WorkoutID: exercise.WorkoutID,
+
+				Name: exercise.Name,
+				Note: exercise.Note,
+
+				Sets: exercise.Sets,
+				Reps: exercise.Reps,
+
+				CreatedAt: workout.CreatedAt,
+				UpdatedAt: workout.UpdatedAt,
+			}
+			wResponse.Exercises = append(wResponse.Exercises, eResponse)
+		}
+
+		wResponses[i] = wResponse
+
+	}
+
+	return c.JSON(http.StatusOK, wResponses)
+}
+
 func GetWorkout(c echo.Context) error {
 	workoutIDStr := c.Param("id")
 	workoutID, err := strconv.ParseUint(workoutIDStr, 10, 32)

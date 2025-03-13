@@ -11,6 +11,68 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetAccount(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+	var user models.User
+	if err := db.Preload("Workouts.Exercises").Where("id = ?", claims.ID).First(&user).Error; err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
+	}
+
+	uResponse := models.UserResponse{
+		Username: user.Username,
+		Email:    user.Email,
+
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+
+		Workouts: make([]models.WorkoutResponse, len(user.Workouts)),
+	}
+
+	for i, workout := range user.Workouts {
+		wResponse := models.WorkoutResponse{
+			ID: workout.ID,
+
+			Name: workout.Name,
+			Note: workout.Note,
+
+			LastDone:  workout.LastDone,
+			CreatedAt: workout.CreatedAt,
+			UpdatedAt: workout.UpdatedAt,
+			Exercises: make([]models.ExerciseResponse, len(workout.Exercises)),
+		}
+
+		for i, exercise := range workout.Exercises {
+			eResponse := models.ExerciseResponse{
+				ID:        exercise.ID,
+				WorkoutID: exercise.WorkoutID,
+
+				Name: exercise.Name,
+				Note: exercise.Note,
+
+				Sets: exercise.Sets,
+				Reps: exercise.Reps,
+
+				CreatedAt: workout.CreatedAt,
+				UpdatedAt: workout.UpdatedAt,
+			}
+			wResponse.Exercises[i] = eResponse
+		}
+		uResponse.Workouts[i] = wResponse
+
+	}
+
+	return c.JSON(http.StatusOK, uResponse)
+}
+
+func GetToken(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+	return c.JSON(http.StatusOK, echo.Map{"id": claims.ID, "username": claims.Username})
+}
+
 func EditAccount(c echo.Context) error {
 	var form RegistrationForm
 	if err := c.Bind(&form); err != nil {

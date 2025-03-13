@@ -70,8 +70,11 @@ func main() {
 	group.POST("/login", api.Login)
 	group.POST("/register", api.Register)
 
+	restricted.GET("/token", api.GetToken)
+	restricted.GET("/account", api.GetAccount)
 	restricted.PATCH("/account", api.EditAccount)
 
+	restricted.GET("/workouts", api.GetAllWorkouts)
 	restricted.GET("/workout/:id", api.GetWorkout)
 	restricted.PUT("/workout", api.AddWorkout)
 	restricted.PATCH("/workout/:id", api.EditWorkout)

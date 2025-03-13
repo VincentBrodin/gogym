@@ -24,3 +24,15 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type UserResponse struct {
+	ID uint `json:"id"`
+
+	Username string `json:"uname"`
+	Email    string `json:"email"`
+
+	Workouts []WorkoutResponse `json:"workouts"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
