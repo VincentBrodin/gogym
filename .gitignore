@@ -1,0 +1,63 @@
+# ======================
+# Backend (Go) specific
+# ======================
+
+# Environment and configuration files
+backend/.env
+backend/.air.toml
+
+# Temporary files and directories
+backend/tmp/
+
+# Compiled binaries and plugins (for Linux, Windows, macOS)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries (built by `go test -c`)
+*.test
+
+# (Optional) Vendoring (if you are not committing vendor code)
+# vendor/
+
+# IDE and editor files for Go
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+
+# ======================
+# Frontend (Vue) specific
+# ======================
+
+# Node modules and build output
+frontend/node_modules/
+frontend/dist/
+
+# Environment files (if used by your Vue app)
+frontend/.env.local
+frontend/.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE/editor specific files
+frontend/.vscode/
+frontend/.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# (Optional) Test coverage output (if you run tests that generate coverage reports)
+coverage/
+
+
