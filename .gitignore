@@ -42,6 +42,9 @@ frontend/dist/
 # Environment files (if used by your Vue app)
 frontend/.env.local
 frontend/.env.*.local
+frontend/.env.development
+frontend/.env.production
+
 
 # Log files
 npm-debug.log*
