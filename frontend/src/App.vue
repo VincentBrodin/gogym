@@ -1,12 +1,8 @@
-<script setup>
-	import Home from './components/Home.vue'
-</script>
-
 <template>
-	<main>
-		<Home />
-	</main>
+	<router-view />
+	<Dock />
 </template>
 
-<style scoped>
-</style>
+<script setup>
+	import Dock from "./components/Dock.vue";
+</script>

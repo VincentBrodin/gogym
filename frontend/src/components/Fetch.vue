@@ -1,5 +1,6 @@
 <script>
-	const API_URL = `http://localhost:8080`
+	const API_URL = `http://localhost:8080/api/restricted/account`
+	const TOKEN = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidW5hbWUiOiJ2aW50ZSIsImV4cCI6MTc0MjEyMzQxNH0.GAbRQGc6C1IUpc_2NXARFXuHBTIHeJvtlNotcg7HQYo`
 
 	export default {
 		data: () => ({
@@ -15,11 +16,11 @@
 		methods: {
 			async fetchData() {
 				const url = `${API_URL}`
-				const json = await (await fetch(url)).json();
-				this.msg_body = json.message;
-				this.msg_name = json.name;
-
-				document.title = `${this.msg_body} ${this.msg_name}`
+				const json = await (await fetch(url, {
+					method: "GET", 
+					headers: {Authorization: `Bearer ${TOKEN}`}
+				})).json();
+				console.log(json)
 			},
 		}
 	}
