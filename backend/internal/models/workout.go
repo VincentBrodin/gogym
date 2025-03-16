@@ -32,3 +32,23 @@ type WorkoutResponse struct {
 
 	Exercises []ExerciseResponse `json:"exercises"`
 }
+
+func (w *Workout) CreateResponse() WorkoutResponse {
+	response := WorkoutResponse{
+		ID: w.ID,
+
+		Name: w.Name,
+		Note: w.Note,
+
+		LastDone:  w.LastDone,
+		CreatedAt: w.CreatedAt,
+		UpdatedAt: w.UpdatedAt,
+		Exercises: make([]ExerciseResponse, len(w.Exercises)),
+	}
+
+	for i, exercise := range w.Exercises {
+		response.Exercises[i] = exercise.CreateResponse()
+	}
+
+	return response
+}

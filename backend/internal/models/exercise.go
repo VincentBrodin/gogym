@@ -14,6 +14,8 @@ type Exercise struct {
 	Name string `gorm:"not null"`
 	Note *string
 
+	Order int
+
 	Sets int `gorm:"not null"`
 	Reps int `gorm:"not null"`
 
@@ -28,9 +30,30 @@ type ExerciseResponse struct {
 	Name string  `json:"name"`
 	Note *string `json:"note"`
 
+	Order int `json:"order"`
+
 	Sets int `json:"sets"`
 	Reps int `json:"reps"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (e *Exercise) CreateResponse() ExerciseResponse {
+	return ExerciseResponse{
+		ID:        e.ID,
+		WorkoutID: e.WorkoutID,
+
+		Name: e.Name,
+		Note: e.Note,
+		
+		Order: e.Order,
+
+		Sets: e.Sets,
+		Reps: e.Reps,
+
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
+	}
+
 }

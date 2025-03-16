@@ -37,21 +37,7 @@ func GetExercise(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
-	eResponse := models.ExerciseResponse{
-		ID:        exercise.ID,
-		WorkoutID: exercise.WorkoutID,
-
-		Name: exercise.Name,
-		Note: exercise.Note,
-
-		Sets: exercise.Sets,
-		Reps: exercise.Reps,
-
-		CreatedAt: exercise.CreatedAt,
-		UpdatedAt: exercise.UpdatedAt,
-	}
-
-	return c.JSON(http.StatusOK, eResponse)
+	return c.JSON(http.StatusOK, exercise.CreateResponse())
 }
 
 func AddExercise(c echo.Context) error {
