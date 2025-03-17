@@ -14,7 +14,7 @@ type Exercise struct {
 	Name string `gorm:"not null"`
 	Note *string
 
-	Order int
+	Order int `gorm:"not null"`
 
 	Sets int `gorm:"not null"`
 	Reps int `gorm:"not null"`
@@ -46,7 +46,7 @@ func (e *Exercise) CreateResponse() ExerciseResponse {
 
 		Name: e.Name,
 		Note: e.Note,
-		
+
 		Order: e.Order,
 
 		Sets: e.Sets,

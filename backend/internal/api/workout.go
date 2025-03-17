@@ -131,7 +131,6 @@ func DeleteWorkout(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
-	// Then delete the workout
 	if err := db.Where("id = ? AND user_id = ?", workoutID, claims.ID).Delete(&models.Workout{}).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
