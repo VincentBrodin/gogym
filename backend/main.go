@@ -83,6 +83,7 @@ func main() {
 	restricted.GET("/exercise/:id", api.GetExercise)
 	restricted.PUT("/exercise", api.AddExercise)
 	restricted.PATCH("/exercise/:id", api.EditExercise)
+	restricted.PATCH("/exercises", api.EditAllExercises)
 	restricted.DELETE("/exercise/:id", api.DeleteExercise)
 
 	restricted.GET("/test", func(c echo.Context) error {
