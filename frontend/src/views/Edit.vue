@@ -22,7 +22,8 @@
 			<!--EXERCISE-->
 			<transition-group name="exercise" tag="div" class="w-full">
 				<ExerciseItem v-for="exercise in workout.exercises" :key="exercise.id" :exercise="exercise"
-					:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove" />
+					:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove"
+					@change="triggerUpdate(exercise)" />
 			</transition-group>
 			<div class="w-full h-32">
 
@@ -33,7 +34,8 @@
 </template>
 
 <script setup>
-	import {ref, onMounted} from "vue";
+	const optemistic = true;
+	import {ref, onMounted, nextTick} from "vue";
 	import {useRoute} from 'vue-router'
 	import AddExerciseModal from '../components/AddExerciseModal.vue'
 	import ExerciseItem from '../components/ExerciseItem.vue'
@@ -46,7 +48,42 @@
 
 	const id = route.query.id;
 
-	function moveUp(exercise) {
+	let updateTimeout = null
+
+	async function triggerWideUpdate() {
+		if (updateTimeout) clearTimeout(updateTimeout)
+		updateTimeout = setTimeout(async () => {
+			await wideUpdate()
+		}, 750)
+	}
+
+	const debouncedUpdates = new Map();
+	function triggerUpdate(exercise) {
+		const {id} = exercise;
+		if (!debouncedUpdates.has(id)) {
+			debouncedUpdates.set(id, debounce(id, update, 750));
+		}
+		debouncedUpdates.get(id)(exercise);
+	}
+
+	const timers = new Map();
+	function debounce(id, func, delay) {
+		return function (...args) {
+			if (timers.has(id)) {
+				clearTimeout(timers.get(id));
+			}
+			const timer = setTimeout(() => {
+				func(...args);
+				timers.delete(id);
+			}, delay);
+			timers.set(id, timer);
+		};
+	}
+
+
+
+
+	async function moveUp(exercise) {
 		const start = exercise.order;
 		const above = workout.value.exercises.find(e => e.order == start - 1);
 		if (above == undefined) return;
@@ -54,10 +91,12 @@
 		above.order = start;
 		workout.value.exercises.sort((a, b) => a.order - b.order);
 
-		update();
+		await nextTick();
+		await triggerWideUpdate();
+
 	}
 
-	function moveDown(exercise) {
+	async function moveDown(exercise) {
 		const start = exercise.order;
 		const below = workout.value.exercises.find(e => e.order == start + 1);
 		if (below == undefined) return;
@@ -65,12 +104,16 @@
 		below.order = start;
 		workout.value.exercises.sort((a, b) => a.order - b.order);
 
-		update();
+		await nextTick();
+		await triggerWideUpdate();
 	}
 
 	async function remove(exercise) {
 		workout.value.exercises.splice(workout.value.exercises.indexOf(exercise), 1);
 		workout.value.exercises.sort((a, b) => a.order - b.order);
+
+		await nextTick();
+
 		for (let i in workout.value.exercises) {
 			workout.value.exercises[i].order = i;
 		}
@@ -87,23 +130,74 @@
 			if (!response.ok) {
 				throw new Error((await response.json()).error);
 			}
+
+			if (!optemistic) {
+				workout.value.exercises = await response.json();
+				workout.value.exercises.sort((a, b) => a.order - b.order);
+				console.log(workout.value.exercises)
+			}
+			console.log("Removed")
 		}
 		catch (err) {
 			console.log(err)
-			error.value = true;
-		} finally {
-			loading.value = false;
 		}
 	}
 
-	async function update() {
+	async function wideUpdate() {
+		const token = localStorage.getItem('token');
+		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercises`;
+		try {
+			const response = await fetch(url, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + token
+				},
+				body: JSON.stringify(workout.value.exercises)
+			});
+			if (!response.ok) {
+				throw new Error((await response.json()).error);
+			}
+
+			if (!optemistic) {
+				workout.value.exercises = await response.json();
+				workout.value.exercises.sort((a, b) => a.order - b.order);
+				console.log(workout.value.exercises)
+			}
+			console.log("Update")
+		}
+		catch (err) {
+			console.log(err)
+		}
+	}
+
+	async function update(exercise) {
+		const token = localStorage.getItem('token');
+		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise/${exercise.id}`;
+		try {
+			const response = await fetch(url, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + token
+				},
+				body: JSON.stringify(exercise)
+			});
+
+			if (!response.ok) {
+				throw new Error((await response.json()).error);
+			}
+
+			console.log("Update " + exercise.id)
+		}
+		catch (err) {
+			console.log(err)
+		}
 	}
 
 
 	async function addExercise(exercise) {
 		exercise.workout_id = workout.value.id;
-		exercise.order = workout.value.exercises.length;
-		console.log(exercise);
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise`;
 		try {
@@ -120,12 +214,10 @@
 			}
 			workout.value.exercises.push(await response.json());
 			workout.value.exercises.sort((a, b) => a.order - b.order);
+			console.log("Added")
 		}
 		catch (err) {
 			console.log(err)
-			error.value = true;
-		} finally {
-			loading.value = false;
 		}
 	}
 

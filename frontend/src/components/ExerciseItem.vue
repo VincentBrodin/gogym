@@ -44,11 +44,13 @@
 
 
 <script setup>
+	import {watch} from 'vue';
+
 	const props = defineProps({
 		exercise: Object,
 		total: Number
 	});
-	const emit = defineEmits(["move-up", "move-down","remove"]);
+	const emit = defineEmits(["move-up", "move-down", "remove", "change"]);
 
 	function moveUp() {
 		emit("move-up", props.exercise);
@@ -60,5 +62,16 @@
 	function remove() {
 		emit("remove", props.exercise);
 	}
+
+	watch(
+		() => props.exercise,
+		(newValue, _) => {
+			newValue.sets = parseInt(newValue.sets)
+			newValue.reps = parseInt(newValue.reps)
+			emit('change', newValue);
+		},
+		{deep: true}
+	);
+
 
 </script>
