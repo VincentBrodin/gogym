@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from './views/Home.vue';
-import About from './views/About.vue';
 import Login from './views/Login.vue';
 import Edit from './views/Edit.vue';
 import Register from './views/Register.vue';
@@ -8,10 +7,9 @@ import { jwtDecode } from 'jwt-decode';
 
 const routes = [
 	{ path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
-	{ path: '/about', name: 'About', component: About },
+	{ path: '/edit', name: 'edit', component: Edit, meta: { requiresAuth: true } },
 	{ path: '/login', name: 'login', component: Login },
 	{ path: '/register', name: 'register', component: Register },
-	{ path: '/edit', name: 'edit', component: Edit }
 ];
 
 const router = createRouter({

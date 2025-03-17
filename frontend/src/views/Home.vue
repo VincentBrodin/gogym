@@ -65,7 +65,7 @@
 				},
 			});
 			if (!response.ok) {
-				throw new Error('Failed to fetch workouts');
+				throw new Error((await response.json()).error);
 			}
 			workouts.value = await response.json();
 			console.log(workouts.value)

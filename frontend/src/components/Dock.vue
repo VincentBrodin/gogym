@@ -7,7 +7,7 @@
 			</button>
 		</router-link>
 
-		<router-link to="/about">
+		<router-link to="/">
 			<button class="flex flex-col justify-between items-center">
 				<i class="bi bi-clipboard-data text-xl"></i>
 				<span class="dock-label">Stats</span>
