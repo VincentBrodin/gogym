@@ -9,27 +9,13 @@
 				<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
 			</div>
 			<transition-group name="workout" tag="div" class="w-full">
-				<button
-					class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 border border-primary"
-					v-for="workout in workouts" :key="workout.id" @click="startWorkout(workout)">
-					<div>
-						<h1 class="text-xl text-left">{{workout.name}}</h1>
-						<p class="text-xs text-left opacity-60">{{workout.note}}</p>
-					</div>
-					<div>
-						<button class="btn btn-square btn-ghost" @click.stop="editWorkout(workout)">
-							<i class="bi bi-pencil text-xl"></i>
-						</button>
-						<button class="btn btn-square btn-ghost" @click.stop="removeWorkout(workout)">
-							<i class="bi bi-trash text-xl text-error"></i>
-						</button>
-
-					</div>
-				</button>
+				<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout"
+					@click="startWorkout(workout)" @edit="editWorkout" @remove="removeWorkout" />
 			</transition-group>
 		</div>
 	</div>
 	<AddWorkoutModal @add-workout="addWorkout" />
+	<ActiveWorkoutButton />
 </template>
 
 <script setup>
@@ -38,36 +24,14 @@
 	import {jwtDecode} from 'jwt-decode';
 
 	import AddWorkoutModal from "@/components/AddWorkoutModal.vue";
+	import ActiveWorkoutButton from "@/components/ActiveWorkoutButton.vue";
+	import WorkoutItem from "@/components/WorkoutItem.vue";
 
 	const router = useRouter()
 
 	const workouts = ref([]);
 	const loading = ref(true);
 	const name = ref("John Doe");
-
-	async function addWorkout(workout) {
-		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout`;
-		try {
-			const response = await fetch(url, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": "Bearer " + token
-				},
-				body: JSON.stringify(workout),
-			});
-			if (!response.ok) {
-				throw new Error((await response.json()).error);
-			}
-
-			workouts.value.push(await response.json());
-			console.log("Added");
-		}
-		catch (err) {
-			console.log(err)
-		}
-	}
 
 
 	async function loadWorkouts() {
@@ -95,6 +59,7 @@
 				throw new Error((await response.json()).error);
 			}
 			workouts.value = await response.json();
+			workouts.value.sort((a, b) => Date.parse(a.last_done) - Date.parse(b.last_done));
 			console.log(workouts.value)
 		}
 		catch (error) {
@@ -110,6 +75,32 @@
 		console.log("Start")
 		console.log(workout)
 	}
+
+	async function addWorkout(workout) {
+		const token = localStorage.getItem('token');
+		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout`;
+		try {
+			const response = await fetch(url, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + token
+				},
+				body: JSON.stringify(workout),
+			});
+			if (!response.ok) {
+				throw new Error((await response.json()).error);
+			}
+
+			workouts.value.push(await response.json());
+			console.log("Added");
+		}
+		catch (err) {
+			console.log(err)
+		}
+	}
+
+
 
 	function editWorkout(workout) {
 		router.push({

@@ -1,5 +1,5 @@
 <template>
-	<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 gap-8 border border-primary">
+	<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 gap-8 border">
 		<div class="grow">
 			<!--INFO-->
 			<fieldset class="fieldset">
