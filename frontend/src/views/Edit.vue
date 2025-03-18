@@ -23,7 +23,7 @@
 			<transition-group name="exercise" tag="div" class="w-full">
 				<ExerciseItem v-for="exercise in workout.exercises" :key="exercise.id" :exercise="exercise"
 					:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove"
-					@change="triggerUpdate(exercise)" />
+					@change="triggerUpdateExercise(exercise)" />
 			</transition-group>
 			<div class="w-full h-32">
 
@@ -35,33 +35,28 @@
 
 <script setup>
 	const optemistic = true;
-	import {ref, onMounted, nextTick} from "vue";
+	import {ref, onMounted, nextTick, watch} from "vue";
 	import {useRoute} from 'vue-router'
-	import AddExerciseModal from '../components/AddExerciseModal.vue'
-	import ExerciseItem from '../components/ExerciseItem.vue'
+	import AddExerciseModal from '@/components/AddExerciseModal.vue'
+	import ExerciseItem from '@/components/ExerciseItem.vue'
 
 	const route = useRoute()
 
-	const workout = ref(null);
+	const workout = ref({name: "", note: ""});
 	const loading = ref(true);
 	const error = ref(false);
 
 	const id = route.query.id;
 
-	let updateTimeout = null
+	let updateExerciseTimeout = null
+	let updateWorkoutTimeout = null
 
-	async function triggerWideUpdate() {
-		if (updateTimeout) clearTimeout(updateTimeout)
-		updateTimeout = setTimeout(async () => {
-			await wideUpdate()
-		}, 750)
-	}
 
 	const debouncedUpdates = new Map();
-	function triggerUpdate(exercise) {
+	function triggerUpdateExercise(exercise) {
 		const {id} = exercise;
 		if (!debouncedUpdates.has(id)) {
-			debouncedUpdates.set(id, debounce(id, update, 750));
+			debouncedUpdates.set(id, debounce(id, updateExercise, 750));
 		}
 		debouncedUpdates.get(id)(exercise);
 	}
@@ -92,7 +87,7 @@
 		workout.value.exercises.sort((a, b) => a.order - b.order);
 
 		await nextTick();
-		await triggerWideUpdate();
+		await triggerUpdateAllExercises();
 
 	}
 
@@ -105,7 +100,7 @@
 		workout.value.exercises.sort((a, b) => a.order - b.order);
 
 		await nextTick();
-		await triggerWideUpdate();
+		await triggerUpdateAllExercises();
 	}
 
 	async function remove(exercise) {
@@ -143,35 +138,11 @@
 		}
 	}
 
-	async function wideUpdate() {
-		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercises`;
-		try {
-			const response = await fetch(url, {
-				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": "Bearer " + token
-				},
-				body: JSON.stringify(workout.value.exercises)
-			});
-			if (!response.ok) {
-				throw new Error((await response.json()).error);
-			}
+	async function updateExercise(exercise) {
+		// Force numbers 
+		exercise.sets = parseInt(exercise.sets, 10);
+		exercise.reps = parseInt(exercise.reps, 10);
 
-			if (!optemistic) {
-				workout.value.exercises = await response.json();
-				workout.value.exercises.sort((a, b) => a.order - b.order);
-				console.log(workout.value.exercises)
-			}
-			console.log("Update")
-		}
-		catch (err) {
-			console.log(err)
-		}
-	}
-
-	async function update(exercise) {
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise/${exercise.id}`;
 		try {
@@ -195,9 +166,82 @@
 		}
 	}
 
+	async function triggerUpdateAllExercises() {
+		if (updateExerciseTimeout) clearTimeout(updateExerciseTimeout)
+		updateExerciseTimeout = setTimeout(async () => {
+			// Force numbers 
+			for (let exercise of workout.value.exercises) {
+				exercise.sets = parseInt(exercise.sets, 10);
+				exercise.reps = parseInt(exercise.reps, 10);
+			}
+			const token = localStorage.getItem('token');
+			const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercises/${workout.value.id}`;
+			try {
+				const response = await fetch(url, {
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": "Bearer " + token
+					},
+					body: JSON.stringify(workout.value.exercises)
+				});
+				if (!response.ok) {
+					throw new Error((await response.json()).error);
+				}
+
+				if (!optemistic) {
+					workout.value.exercises = await response.json();
+					workout.value.exercises.sort((a, b) => a.order - b.order);
+					console.log(workout.value.exercises)
+				}
+				console.log("Update")
+			}
+			catch (err) {
+				console.log(err)
+			}
+		}, 750)
+	}
+
+	async function triggerUpdateWorkout() {
+		if (updateWorkoutTimeout) clearTimeout(updateWorkoutTimeout)
+		updateWorkoutTimeout = setTimeout(async () => {
+			// Force numbers 
+			for (let exercise of workout.value.exercises) {
+				exercise.sets = parseInt(exercise.sets, 10);
+				exercise.reps = parseInt(exercise.reps, 10);
+			}
+			const token = localStorage.getItem('token');
+			const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout/${workout.value.id}`;
+			try {
+				const response = await fetch(url, {
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": "Bearer " + token
+					},
+					body: JSON.stringify(workout.value)
+				});
+				if (!response.ok) {
+					throw new Error((await response.json()).error);
+				}
+
+				console.log("Update")
+			}
+			catch (err) {
+				console.log(err)
+			}
+		}, 750)
+	}
+
+
+
 
 	async function addExercise(exercise) {
 		exercise.workout_id = workout.value.id;
+		// Force numbers 
+		exercise.sets = parseInt(exercise.sets, 10);
+		exercise.reps = parseInt(exercise.reps, 10);
+
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise`;
 		try {
@@ -248,4 +292,20 @@
 	}
 
 	onMounted(loadWorkout);
+
+	watch(
+		() => ({
+			name: workout.value.name,
+			note: workout.value.note,
+		}),
+		(_, oldValue) => {
+			if (oldValue.name == "") {
+				return;
+			}
+			triggerUpdateWorkout();
+		},
+		{deep: true}
+	);
+
+
 </script>

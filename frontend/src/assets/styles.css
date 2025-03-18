@@ -13,16 +13,18 @@ body,
 	padding: 0;
 }
 
-.exercise-move {
+.exercise-move,
+.workout-move {
 	transition: transform 0.5s ease;
 }
 
-
-.exercise-leave-active {
+.exercise-leave-active,
+.workout-leave-active {
 	transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.exercise-leave-to {
+.exercise-leave-to,
+.workout-leave-to {
 	opacity: 0;
 	transform: translateX(50px);
 }

@@ -22,13 +22,13 @@
 				<!--SETS-->
 				<fieldset class="fieldset w-full mt-4">
 					<legend class="fieldset-legend text-left">Sets: {{exercise.sets}}</legend>
-					<input v-model="exercise.sets" type="range" min="1" max="8" class="range w-full" step="1" />
+					<input v-model.number="exercise.sets" type="range" min="1" max="8" class="range w-full" step="1" />
 				</fieldset>
 
 				<!--REPS-->
 				<fieldset class="fieldset w-full mt-4">
 					<legend class="fieldset-legend text-left">Reps: {{exercise.reps}}</legend>
-					<input v-model="exercise.reps" type="range" min="1" max="20" class="range w-full" step="1" />
+					<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range w-full" step="1" />
 				</fieldset>
 
 				<button type="submit" class="btn btn-primary w-full mt-4">Add</button>
@@ -53,6 +53,8 @@
 	});
 
 	function submit() {
+		exercise.value.sets = parseInt(exercise.value.sets);
+		exercise.value.reps = parseInt(exercise.value.reps);
 		emit("add-exercise", {...exercise.value});
 		exercise.value.name = "";
 		exercise.value.note = "";

@@ -2,19 +2,27 @@
 	<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 gap-8 border border-primary">
 		<div class="grow">
 			<!--INFO-->
-			<h1 class="text-xl text-left">{{exercise.name}}</h1>
-			<p class="text-xs text-left opacity-60">{{exercise.note}}</p>
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend text-left">Name</legend>
+				<input v-model="exercise.name" type="text" class="input w-full" placeholder="Name" />
+			</fieldset>
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend text-left">Note</legend>
+				<input v-model="exercise.note" type="text" class="input w-full" placeholder="Note" />
+				<p class="fieldset-label">Not required</p>
+			</fieldset>
+
 
 			<!--SETS-->
 			<fieldset class="fieldset w-full mt-4">
 				<legend class="fieldset-legend text-left">Sets: {{exercise.sets}}</legend>
-				<input v-model="exercise.sets" type="range" min="1" max="8" class="range" step="1" />
+				<input v-model.number="exercise.sets" type="range" min="1" max="8" class="range" step="1" />
 			</fieldset>
 
 			<!--REPS-->
 			<fieldset class="fieldset w-full mt-4">
 				<legend class="fieldset-legend text-left">Reps: {{exercise.reps}}</legend>
-				<input v-model="exercise.reps" type="range" min="1" max="20" class="range" step="1" />
+				<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range" step="1" />
 			</fieldset>
 
 		</div>
@@ -64,14 +72,18 @@
 	}
 
 	watch(
-		() => props.exercise,
+		() => ({
+			name: props.exercise.name,
+			note: props.exercise.note,
+			sets: props.exercise.sets,
+			reps: props.exercise.reps,
+		}),
 		(newValue, _) => {
-			newValue.sets = parseInt(newValue.sets)
-			newValue.reps = parseInt(newValue.reps)
-			emit('change', newValue);
+			props.exercise.sets = parseInt(newValue.sets, 10);
+			props.exercise.reps = parseInt(newValue.reps, 10);
+			emit('change', {...props.exercise});
 		},
 		{deep: true}
 	);
-
 
 </script>
