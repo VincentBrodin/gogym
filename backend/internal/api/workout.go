@@ -79,7 +79,7 @@ func AddWorkout(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{"id": workout.ID})
+	return c.JSON(http.StatusOK, workout.CreateResponse())
 }
 
 func EditWorkout(c echo.Context) error {
@@ -112,7 +112,7 @@ func EditWorkout(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, "updated")
+	return c.JSON(http.StatusOK, workout.CreateResponse())
 }
 
 func DeleteWorkout(c echo.Context) error {

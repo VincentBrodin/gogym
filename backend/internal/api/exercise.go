@@ -123,6 +123,12 @@ func EditExercise(c echo.Context) error {
 }
 
 func EditAllExercises(c echo.Context) error {
+	workoutIDStr := c.Param("id")
+	workoutID, err := strconv.ParseUint(workoutIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+	}
+
 	var forms []AddExerciseForm
 	if err := c.Bind(&forms); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
@@ -134,9 +140,6 @@ func EditAllExercises(c echo.Context) error {
 
 	userToken := c.Get("user").(*jwt.Token)
 	claims := userToken.Claims.(*models.JwtUserClaims)
-
-	// This is a bit optimistic but will do
-	workoutID := forms[0].WorkoutID
 
 	db := c.Get("db").(*gorm.DB)
 
@@ -169,7 +172,7 @@ func EditAllExercises(c echo.Context) error {
 	})
 
 	// Update order and save
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		for i := range exercises {
 			exercises[i].Order = i
 			if err := tx.Save(&exercises[i]).Error; err != nil {
