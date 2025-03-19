@@ -17,7 +17,7 @@ type AddExerciseForm struct {
 	ID        uint    `json:"id"`
 	WorkoutID uint    `json:"workout_id"`
 	Name      string  `json:"name"`
-	Note      *string `json:"note"`
+	Note      string `json:"note"`
 
 	Order int `json:"order"`
 

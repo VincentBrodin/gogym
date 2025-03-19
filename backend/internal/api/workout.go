@@ -12,8 +12,8 @@ import (
 )
 
 type AddWorkoutForm struct {
-	Name string  `form:"name"`
-	Note *string `form:"note"`
+	Name string  `json:"name"`
+	Note string `json:"note"`
 }
 
 func GetAllWorkouts(c echo.Context) error {

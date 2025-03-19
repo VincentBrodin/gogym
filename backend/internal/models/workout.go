@@ -13,7 +13,7 @@ type Workout struct {
 	Exercises []Exercise
 
 	Name string `gorm:"not null"`
-	Note *string
+	Note string
 
 	LastDone  time.Time
 	CreatedAt time.Time
@@ -24,7 +24,7 @@ type WorkoutResponse struct {
 	ID uint `json:"id"`
 
 	Name string  `json:"name"`
-	Note *string `json:"note"`
+	Note string `json:"note"`
 
 	LastDone  time.Time `json:"last_done"`
 	CreatedAt time.Time `json:"created_at"`

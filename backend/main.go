@@ -18,12 +18,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func main() {
+type Config struct {
+	ConnectionString string
+	JwtSecret        string
+}
+
+func spawnServer(config Config) *echo.Echo {
+
 	// Load env
 
 	// Init
 	e := echo.New()
-	db, err := gorm.Open(postgres.Open(config.ENV["DB_CONNECTION_STRING"]), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(config.ConnectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
@@ -59,13 +65,13 @@ func main() {
 	group := e.Group("/api")
 
 	restricted := group.Group("/restricted")
-	config := echojwt.Config{
+	jwtConfig := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(models.JwtUserClaims)
 		},
-		SigningKey: []byte(config.ENV["JWT_SECRET"]),
+		SigningKey: []byte(config.JwtSecret),
 	}
-	restricted.Use(echojwt.WithConfig(config))
+	restricted.Use(echojwt.WithConfig(jwtConfig))
 
 	group.POST("/login", api.Login)
 	group.POST("/register", api.Register)
@@ -94,5 +100,16 @@ func main() {
 	})
 
 	// Start
+	return e
+}
+
+func main() {
+	config := Config{
+		ConnectionString: config.ENV["DB_CONNECTION_STRING"],
+		JwtSecret:        config.ENV["JWT_SECRET"],
+	}
+
+	e := spawnServer(config)
 	e.Logger.Fatal(e.Start(":8080"))
+
 }

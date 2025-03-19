@@ -12,7 +12,7 @@ type Exercise struct {
 	Workout   Workout `gorm:"foreignKey:WorkoutID"`
 
 	Name string `gorm:"not null"`
-	Note *string
+	Note string
 
 	Order int `gorm:"not null"`
 
@@ -28,7 +28,7 @@ type ExerciseResponse struct {
 	WorkoutID uint `json:"workout_id"`
 
 	Name string  `json:"name"`
-	Note *string `json:"note"`
+	Note string `json:"note"`
 
 	Order int `json:"order"`
 
