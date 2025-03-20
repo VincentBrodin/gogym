@@ -8,6 +8,7 @@ backend/.air.toml
 
 # Temporary files and directories
 backend/tmp/
+bin/
 
 # Compiled binaries and plugins (for Linux, Windows, macOS)
 *.exe
