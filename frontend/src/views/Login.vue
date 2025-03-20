@@ -29,7 +29,7 @@
 	const submit = async () => {
 		error.value = null;
 
-		const url = `${import.meta.env.VITE_API_URL}/api/login`;
+		const url = `${import.meta.env.VITE_API_URL}api/login`;
 
 		try {
 			loading.value = true;
@@ -45,6 +45,7 @@
 			if (response.ok) {
 				const {token} = await response.json();
 				localStorage.setItem('token', token);
+				console.log(token);
 				const redirectPath = route.query.redirect || '/';
 				console.log(`Logged in moving user to ${redirectPath}`);
 				router.push(redirectPath);

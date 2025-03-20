@@ -44,7 +44,7 @@
 			console.log("Could not get username");
 		}
 
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workouts`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/workouts`;
 
 		try {
 
@@ -78,7 +78,7 @@
 
 	async function addWorkout(workout) {
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/workout`;
 		try {
 			const response = await fetch(url, {
 				method: "PUT",
@@ -113,7 +113,7 @@
 		workouts.value.splice(workouts.value.indexOf(workout), 1);
 
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout/${workout.id}`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/workout/${workout.id}`;
 
 		try {
 

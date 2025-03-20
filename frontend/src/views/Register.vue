@@ -40,7 +40,7 @@
 	const submit = async () => {
 		error.value = null;
 
-		const url = `${import.meta.env.VITE_API_URL}/api/register`;
+		const url = `${import.meta.env.VITE_API_URL}api/register`;
 
 		try {
 			loading.value = true;

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"backend/config"
 	"backend/internal/api"
 	"backend/internal/models"
 	"bytes"
@@ -10,10 +9,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
@@ -29,7 +32,7 @@ var (
 )
 
 func resetDatabase() error {
-	db, err := gorm.Open(postgres.Open(config.ENV["DB_CONNECTION_STRING_TEST"]), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONNECTION_STRING_TEST")), &gorm.Config{})
 	if err != nil {
 		return err
 	}
@@ -76,8 +79,8 @@ func resetDatabase() error {
 		WorkoutID: dummyWorkout.ID,
 		Name:      "dummy exercise",
 		Note:      "some info about dummy workout",
-		Sets: 2,
-		Reps: 8,
+		Sets:      2,
+		Reps:      8,
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}
@@ -88,10 +91,48 @@ func resetDatabase() error {
 	return err
 }
 
-func sendTest(endpoint, method string, payload any) (*httptest.ResponseRecorder, error) {
+func loadEnv() error {
+	_, filename, _, _ := runtime.Caller(0)
+	dir := filepath.Join(filepath.Dir(filename), ".")
+	envPath := filepath.Join(dir, ".env")
+	if err := godotenv.Load(envPath); err != nil {
+		return err
+	}
+	return nil
+}
+
+func sendTestForm(endpoint, method string, payload url.Values) (*httptest.ResponseRecorder, error) {
+	if err := loadEnv(); err != nil {
+		return nil, err
+	}
+
 	testConfig := Config{
-		ConnectionString: config.ENV["DB_CONNECTION_STRING_TEST"],
-		JwtSecret:        config.ENV["JWT_SECRET"],
+		ConnectionString: os.Getenv("DB_CONNECTION_STRING_TEST"),
+		JwtSecret:        os.Getenv("JWT_SECRET"),
+	}
+
+	e := spawnServer(testConfig)
+
+	if err := resetDatabase(); err != nil {
+		return nil, err
+	}
+
+	req := httptest.NewRequest(method, endpoint, strings.NewReader(payload.Encode()))
+	req.Header.Set(echo.HeaderContentType, "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bearer "+dummyJwt)
+	rec := httptest.NewRecorder()
+
+	e.ServeHTTP(rec, req)
+	return rec, nil
+}
+
+func sendTestJson(endpoint, method string, payload any) (*httptest.ResponseRecorder, error) {
+	if err := loadEnv(); err != nil {
+		return nil, err
+	}
+	testConfig := Config{
+		ConnectionString: os.Getenv("DB_CONNECTION_STRING_TEST"),
+		JwtSecret:        os.Getenv("JWT_SECRET"),
 	}
 
 	e := spawnServer(testConfig)
@@ -116,73 +157,32 @@ func sendTest(endpoint, method string, payload any) (*httptest.ResponseRecorder,
 
 // Auth
 func TestLoginEndpoint(t *testing.T) {
-	testConfig := Config{
-		ConnectionString: config.ENV["DB_CONNECTION_STRING_TEST"],
-		JwtSecret:        config.ENV["JWT_SECRET"],
-	}
-
-	e := spawnServer(testConfig)
-	assert.NoError(t, resetDatabase())
-
 	form := url.Values{}
-	form.Set("uname", "dummy")
+	form.Set("uname", "dummy2")
 	form.Set("pswd", "dummypswd")
 
-	reqBody := strings.NewReader(form.Encode())
-	req := httptest.NewRequest(http.MethodPost, "/api/login", reqBody)
-	req.Header.Set(echo.HeaderContentType, "application/x-www-form-urlencoded")
+	rec, err := sendTestForm("/api/restricted/account", http.MethodPatch, form)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
 
-	rec := httptest.NewRecorder()
+}
 
-	e.ServeHTTP(rec, req)
+func TestRegisterEndpoint(t *testing.T) {
+	form := url.Values{}
+	form.Set("uname", "dummy2")
+	form.Set("email", "dummy2@test.com")
+	form.Set("pswd", "dummypswd")
+
+	rec, err := sendTestForm("/api/restricted/account", http.MethodPatch, form)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
-// func TestDuplicateEmail(t *testing.T) {
-// 	testConfig := Config{
-// 		ConnectionString: config.ENV["DB_CONNECTION_STRING_TEST"],
-// 		JwtSecret:        config.ENV["JWT_SECRET"],
-// 	}
-//
-// 	e := spawnServer(testConfig)
-// 	assert.NoError(t, resetDatabase())
-//
-// 	form := url.Values{}
-// 	form.Set("uname", "dummy2")
-// 	form.Set("email", "dummy@test.com") // This email already exists
-// 	form.Set("pswd", "dummypswd")
-//
-// 	reqBody := strings.NewReader(form.Encode())
-// 	req := httptest.NewRequest(http.MethodPost, "/api/register", reqBody)
-// 	req.Header.Set(echo.HeaderContentType, "application/x-www-form-urlencoded")
-//
-// 	rec := httptest.NewRecorder()
-//
-// 	e.ServeHTTP(rec, req)
-// 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
-// }
-
-func TestRegisterEndpoint(t *testing.T) {
-	testConfig := Config{
-		ConnectionString: config.ENV["DB_CONNECTION_STRING_TEST"],
-		JwtSecret:        config.ENV["JWT_SECRET"],
-	}
-
-	e := spawnServer(testConfig)
-	assert.NoError(t, resetDatabase())
-
+func TestEditAccount(t *testing.T) {
 	form := url.Values{}
-	form.Set("uname", "dummy2")
-	form.Set("email", "dummy2@test.com") // This email already exists
-	form.Set("pswd", "dummypswd")
-
-	reqBody := strings.NewReader(form.Encode())
-	req := httptest.NewRequest(http.MethodPost, "/api/register", reqBody)
-	req.Header.Set(echo.HeaderContentType, "application/x-www-form-urlencoded")
-
-	rec := httptest.NewRecorder()
-
-	e.ServeHTTP(rec, req)
+	form.Set("uname", "dummy edited")
+	rec, err := sendTestForm("/api/restricted/account", http.MethodPatch, form)
+	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
@@ -192,7 +192,7 @@ func TestAddWorkout(t *testing.T) {
 		Name: "dummy workout",
 	}
 
-	rec, err := sendTest("/api/restricted/workout", http.MethodPut, payload)
+	rec, err := sendTestJson("/api/restricted/workout", http.MethodPut, payload)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
@@ -202,13 +202,13 @@ func TestEditWorkout(t *testing.T) {
 		Name: "dummy workout edit",
 	}
 
-	rec, err := sendTest(fmt.Sprintf("/api/restricted/workout/%d", dummyWorkout.ID), http.MethodPatch, payload)
+	rec, err := sendTestJson(fmt.Sprintf("/api/restricted/workout/%d", dummyWorkout.ID), http.MethodPatch, payload)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestRemoveWorkout(t *testing.T) {
-	rec, err := sendTest(fmt.Sprintf("/api/restricted/workout/%d", dummyWorkout.ID), http.MethodDelete, nil)
+	rec, err := sendTestJson(fmt.Sprintf("/api/restricted/workout/%d", dummyWorkout.ID), http.MethodDelete, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
@@ -224,7 +224,7 @@ func TestAddExercise(t *testing.T) {
 		Reps: 8,
 	}
 
-	rec, err := sendTest("/api/restricted/exercise", http.MethodPut, payload)
+	rec, err := sendTestJson("/api/restricted/exercise", http.MethodPut, payload)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
@@ -232,17 +232,18 @@ func TestAddExercise(t *testing.T) {
 func TestEditExercise(t *testing.T) {
 	payload := api.AddExerciseForm{
 		Name: "dummy exercise edit",
+		Note: "edit note",
 		Sets: 3,
 		Reps: 12,
 	}
 
-	rec, err := sendTest(fmt.Sprintf("/api/restricted/exercise/%d", dummyExercise.ID), http.MethodPatch, payload)
+	rec, err := sendTestJson(fmt.Sprintf("/api/restricted/exercise/%d", dummyExercise.ID), http.MethodPatch, payload)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestRemoveExercise(t *testing.T) {
-	rec, err := sendTest(fmt.Sprintf("/api/restricted/exercise/%d", dummyExercise.ID), http.MethodDelete, nil)
+	rec, err := sendTestJson(fmt.Sprintf("/api/restricted/exercise/%d", dummyExercise.ID), http.MethodDelete, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }

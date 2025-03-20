@@ -5,12 +5,14 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 
-	"backend/config"
 	"backend/internal/api"
 	"backend/internal/models"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,12 +23,10 @@ import (
 type Config struct {
 	ConnectionString string
 	JwtSecret        string
+	ContentDir       string
 }
 
 func spawnServer(config Config) *echo.Echo {
-
-	// Load env
-
 	// Init
 	e := echo.New()
 	db, err := gorm.Open(postgres.Open(config.ConnectionString), &gorm.Config{})
@@ -62,6 +62,9 @@ func spawnServer(config Config) *echo.Echo {
 	})
 
 	// Routers
+	e.Static("/", config.ContentDir)
+	e.File("/", filepath.Join(config.ContentDir, "index.html"))
+
 	group := e.Group("/api")
 
 	restricted := group.Group("/restricted")
@@ -104,12 +107,27 @@ func spawnServer(config Config) *echo.Echo {
 }
 
 func main() {
-	config := Config{
-		ConnectionString: config.ENV["DB_CONNECTION_STRING"],
-		JwtSecret:        config.ENV["JWT_SECRET"],
+	ex, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	e := spawnServer(config)
+	appDir := filepath.Dir(ex)
+	envPath := filepath.Join(appDir, ".env")
+
+	if err := godotenv.Load(envPath); err != nil {
+		log.Printf("Error loading .env from %s: %v", envPath, err)
+	}
+
+	serverConfig := Config{
+		ConnectionString: os.Getenv("DB_CONNECTION_STRING"),
+		JwtSecret:        os.Getenv("JWT_SECRET"),
+		ContentDir:       filepath.Join(appDir, "content"),
+	}
+
+	fmt.Println(serverConfig.ConnectionString)
+
+	e := spawnServer(serverConfig)
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

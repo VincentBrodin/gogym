@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 	"net/mail"
+	"os"
 	"time"
 
-	"backend/config"
 	"backend/internal/models"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -113,7 +113,7 @@ func GenerateUserToken(user models.User) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString([]byte(config.ENV["JWT_SECRET"]))
+	t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		return "", err
 	}

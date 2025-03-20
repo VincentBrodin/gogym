@@ -64,6 +64,29 @@ body,
 	transform: translateX(50px);
 }
 
+
+input[type="range"] {
+    pointer-events: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+    pointer-events: none;
+}
+input[type="range"]::-moz-range-track {
+    pointer-events: none;
+}
+input[type="range"]::-ms-track {
+    pointer-events: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    pointer-events: auto;
+}
+input[type="range"]::-moz-range-thumb {
+    pointer-events: auto;
+}
+input[type="range"]::-ms-thumb {
+    pointer-events: auto;
+}
+
 /*#app {*/
 /*	min-height: 100vh;*/
 /*}*/

@@ -113,7 +113,7 @@
 			workout.value.exercises[i].order = i;
 		}
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise/${exercise.id}`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/exercise/${exercise.id}`;
 		try {
 			const response = await fetch(url, {
 				method: "DELETE",
@@ -144,7 +144,7 @@
 		exercise.reps = parseInt(exercise.reps, 10);
 
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise/${exercise.id}`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/exercise/${exercise.id}`;
 		try {
 			const response = await fetch(url, {
 				method: "PATCH",
@@ -175,7 +175,7 @@
 				exercise.reps = parseInt(exercise.reps, 10);
 			}
 			const token = localStorage.getItem('token');
-			const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercises/${workout.value.id}`;
+			const url = `${import.meta.env.VITE_API_URL}api/restricted/exercises/${workout.value.id}`;
 			try {
 				const response = await fetch(url, {
 					method: "PATCH",
@@ -211,7 +211,7 @@
 				exercise.reps = parseInt(exercise.reps, 10);
 			}
 			const token = localStorage.getItem('token');
-			const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout/${workout.value.id}`;
+			const url = `${import.meta.env.VITE_API_URL}api/restricted/workout/${workout.value.id}`;
 			try {
 				const response = await fetch(url, {
 					method: "PATCH",
@@ -243,7 +243,7 @@
 		exercise.reps = parseInt(exercise.reps, 10);
 
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/exercise`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/exercise`;
 		try {
 			const response = await fetch(url, {
 				method: "PUT",
@@ -267,7 +267,7 @@
 
 	async function loadWorkout() {
 		const token = localStorage.getItem('token');
-		const url = `${import.meta.env.VITE_API_URL}/api/restricted/workout/${id}`;
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/workout/${id}`;
 		try {
 			const response = await fetch(url, {
 				method: "GET",
