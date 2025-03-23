@@ -2,6 +2,7 @@ package api
 
 import (
 	"backend/internal/models"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -65,6 +66,66 @@ func StartSession(c echo.Context) error {
 	}
 
 	if err := db.Create(&workoutSession).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, workoutSession.CreateResponse())
+}
+
+func EditSession(c echo.Context) error {
+	sessionIDStr := c.Param("id")
+	sessionID, err := strconv.ParseUint(sessionIDStr, 10, 32)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid ID")
+	}
+
+	var form models.WorkoutSessionResponse
+	if err := c.Bind(&form); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
+	}
+
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+
+	var workoutSession models.WorkoutSession
+	if err := db.Preload("Workout").Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	workoutSession.Active = form.Active
+	workoutSession.EndedAt = time.Now().UTC()
+
+	// Create a map to sync incoming with db
+	exerciseMap := make(map[uint]*models.ExerciseSession)
+	for i := range workoutSession.ExerciseSessions {
+		exerciseMap[workoutSession.ExerciseSessions[i].ID] = &workoutSession.ExerciseSessions[i]
+	}
+
+	for _, newExercise := range form.ExerciseSessions {
+		if oldExercise, ok := exerciseMap[newExercise.ID]; ok {
+			fmt.Println(newExercise.Exercise.Name)
+			oldExercise.Completed = newExercise.Completed
+			oldExercise.Skiped = newExercise.Skiped
+			oldExercise.Active = newExercise.Active
+			oldExercise.SetsDone = newExercise.SetsDone
+		}
+	}
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(&workoutSession).Error; err != nil {
+			return err
+		}
+		for i := range workoutSession.ExerciseSessions {
+			if err := tx.Save(&workoutSession.ExerciseSessions[i]).Error; err != nil {
+				return err // transaction will be rolled back
+			}
+		}
+		return nil // commit the transaction
+	})
+
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
