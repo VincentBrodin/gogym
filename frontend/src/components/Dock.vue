@@ -2,7 +2,7 @@
 	<div class="dock dock-lg">
 		<router-link to="/">
 			<button class="flex flex-col justify-between items-center"
-				:class="{ 'dock-active': ($route.name == 'Home') }">
+				:class="{ 'dock-active': ($route.name == 'home') }">
 				<i class="bi bi-house text-xl"></i>
 				<span class="dock-label">Home</span>
 			</button>

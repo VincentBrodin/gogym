@@ -7,7 +7,7 @@ import Session from './views/Session.vue';
 import { jwtDecode } from 'jwt-decode';
 
 const routes = [
-	{ path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
+	{ path: '/', name: 'home', component: Home, meta: { requiresAuth: true } },
 	{ path: '/edit', name: 'edit', component: Edit, meta: { requiresAuth: true } },
 	{ path: '/login', name: 'login', component: Login },
 	{ path: '/register', name: 'register', component: Register },
