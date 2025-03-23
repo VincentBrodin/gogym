@@ -10,12 +10,11 @@
 			</div>
 			<transition-group name="workout" tag="div" class="w-full">
 				<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout"
-					@click="startWorkout(workout)" @edit="editWorkout" @remove="removeWorkout" />
+					@click="startSession(workout)" @edit="editWorkout" @remove="removeWorkout" />
 			</transition-group>
 		</div>
 	</div>
 	<AddWorkoutModal @add-workout="addWorkout" />
-	<ActiveWorkoutButton />
 </template>
 
 <script setup>
@@ -24,7 +23,6 @@
 	import {jwtDecode} from 'jwt-decode';
 
 	import AddWorkoutModal from "@/components/AddWorkoutModal.vue";
-	import ActiveWorkoutButton from "@/components/ActiveWorkoutButton.vue";
 	import WorkoutItem from "@/components/WorkoutItem.vue";
 
 	const router = useRouter()
@@ -71,9 +69,30 @@
 
 	onMounted(loadWorkouts);
 
-	function startWorkout(workout) {
-		console.log("Start")
-		console.log(workout)
+	async function startSession(workout) {
+		const token = localStorage.getItem('token');
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/session/${workout.id}`;
+		try {
+			const response = await fetch(url, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + token
+				},
+			});
+			if (!response.ok) {
+				throw new Error((await response.json()).error);
+			}
+
+			router.push({
+				name: 'session',
+			});
+
+			console.log("Started");
+		}
+		catch (err) {
+			console.log(err)
+		}
 	}
 
 	async function addWorkout(workout) {
@@ -99,8 +118,6 @@
 			console.log(err)
 		}
 	}
-
-
 
 	function editWorkout(workout) {
 		router.push({
