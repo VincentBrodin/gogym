@@ -23,7 +23,7 @@ type Workout struct {
 type WorkoutResponse struct {
 	ID uint `json:"id"`
 
-	Name string  `json:"name"`
+	Name string `json:"name"`
 	Note string `json:"note"`
 
 	LastDone  time.Time `json:"last_done"`
@@ -48,6 +48,56 @@ func (w *Workout) CreateResponse() WorkoutResponse {
 
 	for i, exercise := range w.Exercises {
 		response.Exercises[i] = exercise.CreateResponse()
+	}
+
+	return response
+}
+
+type WorkoutSession struct {
+	ID uint `gorm:"primaryKey"`
+
+	UserID uint  `gorm:"not null"`
+	User   *User `gorm:"foreignKey:UserID"`
+
+	WorkoutID uint     `gorm:"not null"`
+	Workout   *Workout `gorm:"foreignKey:WorkoutID"`
+
+	ExerciseSessions []ExerciseSession
+	Active           bool
+
+	StartedAt time.Time
+	EndedAt   time.Time
+}
+
+type WorkoutSessionResponse struct {
+	ID uint `json:"id"`
+
+	Workout WorkoutResponse `json:"workout"`
+
+	ExerciseSessions []ExerciseSessionResponse `json:"exercise_sessions"`
+
+	Active bool `json:"active"`
+
+	StartedAt time.Time `json:"started_at"`
+	EndedAt   time.Time `json:"endend_at"`
+}
+
+func (ws *WorkoutSession) CreateResponse() WorkoutSessionResponse {
+	response := WorkoutSessionResponse{
+		ID: ws.ID,
+
+		Workout: ws.Workout.CreateResponse(),
+
+		Active: ws.Active,
+
+		StartedAt: ws.StartedAt,
+		EndedAt:   ws.EndedAt,
+
+		ExerciseSessions: make([]ExerciseSessionResponse, len(ws.ExerciseSessions)),
+	}
+
+	for i, exerciseSession := range ws.ExerciseSessions {
+		response.ExerciseSessions[i] = exerciseSession.CreateResponse()
 	}
 
 	return response

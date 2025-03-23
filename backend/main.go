@@ -38,6 +38,8 @@ func spawnServer(config Config) *echo.Echo {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Workout{})
 	db.AutoMigrate(&models.Exercise{})
+	db.AutoMigrate(&models.WorkoutSession{})
+	db.AutoMigrate(&models.ExerciseSession{})
 
 	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -82,6 +84,9 @@ func spawnServer(config Config) *echo.Echo {
 	restricted.GET("/token", api.GetToken)
 	restricted.GET("/account", api.GetAccount)
 	restricted.PATCH("/account", api.EditAccount)
+
+	restricted.PUT("/session/:id", api.StartSession)
+	restricted.GET("/session", api.GetCurrentSession)
 
 	restricted.GET("/workouts", api.GetAllWorkouts)
 	restricted.GET("/workout/:id", api.GetWorkout)

@@ -27,7 +27,7 @@ type ExerciseResponse struct {
 	ID        uint `json:"id"`
 	WorkoutID uint `json:"workout_id"`
 
-	Name string  `json:"name"`
+	Name string `json:"name"`
 	Note string `json:"note"`
 
 	Order int `json:"order"`
@@ -54,6 +54,51 @@ func (e *Exercise) CreateResponse() ExerciseResponse {
 
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
+	}
+
+}
+
+type ExerciseSession struct {
+	ID uint `gorm:"primaryKey"`
+
+	ExerciseID uint      `gorm:"not null"`
+	Exercise   *Exercise `gorm:"foreignKey:ExerciseID"`
+
+	WorkoutSessionID uint            `gorm:"not null"`
+	WorkoutSession   *WorkoutSession `gorm:"foreignKey:WorkoutSessionID"`
+
+	Completed bool
+	Skiped    bool
+	Active    bool
+
+	SetsDone int
+}
+
+type ExerciseSessionResponse struct {
+	ID uint `json:"id"`
+
+	Exercise         ExerciseResponse `json:"exercise"`
+	WorkoutSessionID uint             `json:"workout_session_id"`
+
+	Completed bool `json:"completed"`
+	Skiped    bool `json:"skiped"`
+	Active    bool `json:"active"`
+
+	SetsDone int `json:"sets_done"`
+}
+
+func (es *ExerciseSession) CreateResponse() ExerciseSessionResponse {
+	return ExerciseSessionResponse{
+		ID:               es.ID,
+
+		Exercise:         es.Exercise.CreateResponse(),
+		WorkoutSessionID: es.WorkoutSessionID,
+
+		Completed:        es.Completed,
+		Skiped:           es.Skiped,
+		Active:           es.Active,
+
+		SetsDone: es.SetsDone,
 	}
 
 }
