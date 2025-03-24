@@ -6,10 +6,10 @@ type Exercise struct {
 	ID uint `gorm:"primaryKey"`
 
 	UserID uint  `gorm:"not null"`
-	User   *User `gorm:"foreignKey:UserID"`
+	User   *User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
 	WorkoutID uint    `gorm:"not null"`
-	Workout   Workout `gorm:"foreignKey:WorkoutID"`
+	Workout   Workout `gorm:"foreignKey:WorkoutID;constraint:OnDelete:CASCADE;"`
 
 	Name string `gorm:"not null"`
 	Note string
@@ -67,6 +67,9 @@ func (e *Exercise) CreateResponse() ExerciseResponse {
 
 type ExerciseSession struct {
 	ID uint `gorm:"primaryKey"`
+
+	UserID uint  `gorm:"not null"`
+	User   *User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
 	ExerciseID uint      `gorm:"not null"`
 	Exercise   *Exercise `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`

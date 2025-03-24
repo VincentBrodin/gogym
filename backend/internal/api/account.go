@@ -85,7 +85,7 @@ func EditAccount(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 	var user models.User
 	if err := db.Where("id = ?", claims.ID).First(&user).Error; err != nil {
-		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	uname := len(form.Username)
@@ -100,13 +100,49 @@ func EditAccount(c echo.Context) error {
 	user.UpdatedAt = time.Now().UTC()
 
 	if err := db.Save(&user).Error; err != nil {
-		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	t, err := GenerateUserToken(user)
 	if err != nil {
-		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"token": t})
+}
+
+func DeleteAccount(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+	var user models.User
+	if err := db.Where("id = ?", claims.ID).First(&user).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("user_id = ?", user.ID).Delete(&models.ExerciseSession{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("user_id = ?", user.ID).Delete(&models.WorkoutSession{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("user_id = ?", user.ID).Delete(&models.Exercise{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("user_id = ?", user.ID).Delete(&models.Workout{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&user).Error; err != nil {
+			return err
+		}
+		return nil // commit the transaction
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, "DELETED")
 }

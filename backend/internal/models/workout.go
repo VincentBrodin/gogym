@@ -58,7 +58,7 @@ type WorkoutSession struct {
 	ID uint `gorm:"primaryKey"`
 
 	UserID uint  `gorm:"not null"`
-	User   *User `gorm:"foreignKey:UserID"`
+	User   *User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
 	WorkoutID uint     `gorm:"not null"`
 	Workout   *Workout `gorm:"foreignKey:WorkoutID;constraint:OnDelete:CASCADE;"`

@@ -15,14 +15,14 @@ import (
 )
 
 type RegistrationForm struct {
-	Username string `form:"uname"`
+	Username string `form:"username"`
 	Email    string `form:"email"`
-	Password string `form:"pswd"`
+	Password string `form:"password"`
 }
 
 type LoginForm struct {
-	Username string `form:"uname"`
-	Password string `form:"pswd"`
+	Username string `form:"username"`
+	Password string `form:"password"`
 }
 
 func (form *RegistrationForm) Validate() map[string]string {

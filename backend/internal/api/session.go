@@ -45,6 +45,7 @@ func StartSession(c echo.Context) error {
 	exerciseSessions := make([]models.ExerciseSession, len(workout.Exercises))
 	for i, exercise := range workout.Exercises {
 		exerciseSessions[i] = models.ExerciseSession{
+			UserID: claims.ID,
 			ExerciseID: exercise.ID,
 			Exercise:   &exercise,
 
