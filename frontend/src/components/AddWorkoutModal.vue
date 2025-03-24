@@ -1,6 +1,6 @@
 <template>
 	<div class="fixed px-8 bottom-24 w-full">
-		<button class="w-full btn btn-primary shadow-xl" onclick="addWorkout.showModal()">
+		<button class="w-full btn btn-primary shadow" onclick="addWorkout.showModal()">
 			<i class="bi bi-plus-square-dotted text-2xl"></i>
 		</button>
 	</div>

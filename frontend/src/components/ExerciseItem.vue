@@ -14,38 +14,38 @@
 
 
 			<!--SETS-->
-			<fieldset class="fieldset w-full mt-4">
+			<fieldset class="fieldset w-full">
 				<legend class="fieldset-legend text-left">Sets: {{exercise.sets}}</legend>
 				<input v-model.number="exercise.sets" type="range" min="1" max="8" class="range" step="1" />
 			</fieldset>
 
 			<!--REPS-->
-			<fieldset class="fieldset w-full mt-4">
+			<fieldset class="fieldset w-full">
 				<legend class="fieldset-legend text-left">Reps: {{exercise.reps}}</legend>
 				<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range" step="1" />
 			</fieldset>
 
 			<!--RIR-->
-			<fieldset class="fieldset w-full mt-4">
+			<fieldset class="fieldset w-full">
 				<legend class="fieldset-legend text-left">RIR: {{exercise.rir}}</legend>
 				<input v-model.number="exercise.rir" type="range" min="0" max="4" class="range" step="1" />
 			</fieldset>
 
 		</div>
 		<div class="flex flex-col justify-between">
-			<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-8">
 				<!--UP-->
-				<button v-if="exercise.order != 0" class="btn btn-square btn-ghost" @click.stop="moveUp">
+				<button v-if="exercise.order != 0" class="btn btn-square" @click.stop="moveUp">
 					<i class="bi bi-arrow-up text-xl"></i>
 				</button>
 
 				<!--DOWN-->
-				<button v-if="exercise.order != total - 1" class="btn btn-square btn-ghost" @click.stop="moveDown">
+				<button v-if="exercise.order != total - 1" class="btn btn-square" @click.stop="moveDown">
 					<i class="bi bi-arrow-down text-xl"></i>
 				</button>
 			</div>
 			<!--DELETE-->
-			<button class="btn btn-square btn-ghost" @click.stop="promptRemove">
+			<button class="btn btn-square" @click.stop="promptRemove">
 				<i class="bi bi-trash text-xl text-error"></i>
 			</button>
 

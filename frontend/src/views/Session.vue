@@ -15,8 +15,11 @@
 				</h2>
 			</transition>
 
-			<p class="text-center text-xl mb-12">
+			<p class="text-center text-xl mb-4 opacity-60">
 				{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }}
+			</p>
+			<p class="text-center text-xl mb-12 opacity-60">
+				{{ currentExercise.exercise.rir }} RIR
 			</p>
 
 			<p class="text-center text-5xl font-extrabold">
