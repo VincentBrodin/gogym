@@ -31,6 +31,13 @@
 					<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range w-full" step="1" />
 				</fieldset>
 
+				<!--RIR-->
+				<fieldset class="fieldset w-full mt-4">
+					<legend class="fieldset-legend text-left">RIR: {{exercise.rir}}</legend>
+					<input v-model.number="exercise.rir" type="range" min="0" max="4" class="range w-full" step="1" />
+				</fieldset>
+
+
 				<button type="submit" class="btn btn-primary w-full mt-4">Add</button>
 			</form>
 		</div>
@@ -50,16 +57,19 @@
 		note: "",
 		sets: 3,
 		reps: 8,
+		rir: 0,
 	});
 
 	function submit() {
 		exercise.value.sets = parseInt(exercise.value.sets);
 		exercise.value.reps = parseInt(exercise.value.reps);
+		exercise.value.rir = parseInt(exercise.value.rir);
 		emit("add-exercise", {...exercise.value});
 		exercise.value.name = "";
 		exercise.value.note = "";
 		exercise.value.sets = 3;
 		exercise.value.reps = 8;
+		exercise.value.rir = 0;
 
 	}
 </script>

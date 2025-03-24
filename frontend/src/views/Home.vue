@@ -5,12 +5,12 @@
 	<div v-else class="w-full h-full">
 		<div class="w-full p-8">
 			<div class="mb-8">
-				<h1 class="text-left text-2xl ">Hello {{name}}! </h1>
+				<h1 class="text-left text-2xl font-bold">Hello {{name}}! </h1>
 				<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
 			</div>
 			<transition-group name="workout" tag="div" class="w-full">
-				<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout"
-					@click="startSession(workout)" @edit="editWorkout" @remove="removeWorkout" />
+				<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout" @click="startSession"
+					@edit="editWorkout" @remove="removeWorkout" />
 			</transition-group>
 		</div>
 	</div>
@@ -21,6 +21,8 @@
 	import {ref, onMounted} from "vue";
 	import {useRouter} from 'vue-router'
 	import {jwtDecode} from 'jwt-decode';
+	import {useLocalStorage} from '@vueuse/core'
+
 
 	import AddWorkoutModal from "@/components/AddWorkoutModal.vue";
 	import WorkoutItem from "@/components/WorkoutItem.vue";
@@ -30,6 +32,7 @@
 	const workouts = ref([]);
 	const loading = ref(true);
 	const name = ref("John Doe");
+	const session = useLocalStorage('session', false)
 
 
 	async function loadWorkouts() {
@@ -89,6 +92,7 @@
 			});
 
 			console.log("Started");
+			session.value = true
 		}
 		catch (err) {
 			console.log(err)

@@ -32,6 +32,7 @@
 	import SessionDock from "@/components/SessionDock.vue";
 	import {ref, onMounted, onUnmounted} from "vue";
 	import {useRouter} from "vue-router";
+	import {useLocalStorage} from '@vueuse/core'
 
 	const router = useRouter();
 
@@ -39,6 +40,7 @@
 	let timer;
 
 	const session = ref(null);
+	const hasSession = useLocalStorage('session', false)
 	const currentExercise = ref(null);
 
 	async function next() {
@@ -48,9 +50,13 @@
 			currentExercise.value.completed = true;
 			currentExercise.value.active = false;
 			currentExercise.value.skiped = false;
+
 			const nextExercise = grabNext(session.value.exercise_sessions);
+
+			// Completed
 			if (nextExercise == null) {
 				session.value.active = false;
+				hasSession.value = false;
 				router.push({name: "home"});
 			} else {
 				currentExercise.value = nextExercise;

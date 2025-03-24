@@ -142,6 +142,7 @@
 		// Force numbers 
 		exercise.sets = parseInt(exercise.sets, 10);
 		exercise.reps = parseInt(exercise.reps, 10);
+		exercise.rir = parseInt(exercise.rir, 10);
 
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}api/restricted/exercise/${exercise.id}`;
@@ -173,6 +174,7 @@
 			for (let exercise of workout.value.exercises) {
 				exercise.sets = parseInt(exercise.sets, 10);
 				exercise.reps = parseInt(exercise.reps, 10);
+				exercise.rir = parseInt(exercise.rir, 10);
 			}
 			const token = localStorage.getItem('token');
 			const url = `${import.meta.env.VITE_API_URL}api/restricted/exercises/${workout.value.id}`;
@@ -209,6 +211,7 @@
 			for (let exercise of workout.value.exercises) {
 				exercise.sets = parseInt(exercise.sets, 10);
 				exercise.reps = parseInt(exercise.reps, 10);
+				exercise.rir = parseInt(exercise.rir, 10);
 			}
 			const token = localStorage.getItem('token');
 			const url = `${import.meta.env.VITE_API_URL}api/restricted/workout/${workout.value.id}`;
@@ -241,6 +244,7 @@
 		// Force numbers 
 		exercise.sets = parseInt(exercise.sets, 10);
 		exercise.reps = parseInt(exercise.reps, 10);
+		exercise.rir = parseInt(exercise.rir, 10);
 
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}api/restricted/exercise`;

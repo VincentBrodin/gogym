@@ -1,14 +1,13 @@
 <template>
 	<div class="dock dock-lg">
-		<router-link to="/">
-			<button class="flex flex-col justify-between items-center"
-				:class="{ 'dock-active': ($route.name == 'home') }">
+		<router-link to="/" :class="{ 'dock-active': (page == 'home') }">
+			<button class="flex flex-col justify-between items-center">
 				<i class="bi bi-house text-xl"></i>
 				<span class="dock-label">Home</span>
 			</button>
 		</router-link>
 
-		<router-link to="/session" :class="{ 'disabled': !session }">
+		<router-link to="/session" :class="[{ 'disabled': !session }, { 'dock-active': (page == 'session') }]">
 			<button class="flex flex-col justify-between items-center" :disabled="!session">
 				<i class="bi bi-activity text-xl"></i>
 				<span class="dock-label">Session</span>
@@ -16,7 +15,7 @@
 		</router-link>
 
 		<router-link to="/">
-			<button class="flex flex-col justify-between items-center">
+			<button class="flex flex-col justify-between items-center ">
 				<i class="bi bi-clipboard-data text-xl"></i>
 				<span class="dock-label">Stats</span>
 			</button>
@@ -34,8 +33,20 @@
 </template>
 
 <script setup>
-	import {ref, onMounted} from "vue";
-	const session = ref(false);
+	import {ref, onMounted, watch} from "vue";
+	import {useLocalStorage} from '@vueuse/core';
+	import {useRoute} from 'vue-router';
+
+	const session = useLocalStorage('session', false);
+	const route = useRoute();
+	const page = ref("home");
+	watch(
+		() => route.name,
+		(newPage, oldPage) => {
+			console.log('Route changed from', oldPage, 'to', newPage);
+			page.value = newPage;
+		}
+	);
 
 	async function grabSession() {
 		const token = localStorage.getItem('token');
