@@ -24,6 +24,8 @@ type Exercise struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 	Deleted   bool `gorm:"default:false"`
+
+	ExerciseSessions []ExerciseSession `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
 }
 
 type ExerciseResponse struct {
@@ -67,10 +69,10 @@ type ExerciseSession struct {
 	ID uint `gorm:"primaryKey"`
 
 	ExerciseID uint      `gorm:"not null"`
-	Exercise   *Exercise `gorm:"foreignKey:ExerciseID"`
+	Exercise   *Exercise `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
 
 	WorkoutSessionID uint            `gorm:"not null"`
-	WorkoutSession   *WorkoutSession `gorm:"foreignKey:WorkoutSessionID"`
+	WorkoutSession   *WorkoutSession `gorm:"foreignKey:WorkoutSessionID;constraint:OnDelete:CASCADE;"`
 
 	Completed bool
 	Skiped    bool

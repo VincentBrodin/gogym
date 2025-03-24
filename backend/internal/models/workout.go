@@ -8,8 +8,8 @@ type Workout struct {
 	UserID uint  `gorm:"not null"`
 	User   *User `gorm:"foreignKey:UserID"`
 
-	Exercises       []Exercise       `gorm:"foreignKey:WorkoutID"`
-	WorkoutSessions []WorkoutSession `gorm:"foreignKey:WorkoutID"`
+	Exercises       []Exercise       `gorm:"foreignKey:WorkoutID;constraint:OnDelete:CASCADE;"`
+	WorkoutSessions []WorkoutSession `gorm:"foreignKey:WorkoutID;constraint:OnDelete:CASCADE;"`
 
 	Name string `gorm:"not null"`
 	Note string
@@ -61,9 +61,9 @@ type WorkoutSession struct {
 	User   *User `gorm:"foreignKey:UserID"`
 
 	WorkoutID uint     `gorm:"not null"`
-	Workout   *Workout `gorm:"foreignKey:WorkoutID"`
+	Workout   *Workout `gorm:"foreignKey:WorkoutID;constraint:OnDelete:CASCADE;"`
 
-	ExerciseSessions []ExerciseSession
+	ExerciseSessions []ExerciseSession `gorm:"foreignKey:WorkoutSessionID;constraint:OnDelete:CASCADE;"`
 	Active           bool
 
 	StartedAt time.Time

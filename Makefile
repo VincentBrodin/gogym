@@ -12,6 +12,10 @@ build-docker:
 	$(MAKE) -C frontend build
 	docker build -f Dockerfile -t vincentbrodin/gogym:latest --no-cache .
 
+push-docker:
+	$(MAKE) build-docker
+	docker push vincentbrodin/gogym:latest
+
 start-docker:
 	docker run -d -p 5050:8080 --name gogym vincentbrodin/gogym:latest
 
