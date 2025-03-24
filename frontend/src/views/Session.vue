@@ -8,16 +8,20 @@
 			<h1 class="text-center text-3xl font-bold mb-4">
 				{{ session.workout.name }}
 			</h1>
-			<h2 class="text-center text-2xl font-semibold mb-4">
-				{{ currentExercise.exercise.name }}
-			</h2>
+
+			<transition name="slide-fade" mode="out-in">
+				<h2 class="text-center text-2xl font-semibold mb-4" :key="currentExercise.exercise.name">
+					{{ currentExercise.exercise.name }}
+				</h2>
+			</transition>
+
 			<p class="text-center text-xl mb-12">
 				{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }}
 			</p>
-			<p class="text-center text-5xl font-extrabold ">
+
+			<p class="text-center text-5xl font-extrabold">
 				{{ currentTime }}
 			</p>
-
 		</div>
 
 		<SessionDock @next="next" @skip="skip" />
@@ -27,15 +31,15 @@
 <script setup>
 	import SessionDock from "@/components/SessionDock.vue";
 	import {ref, onMounted, onUnmounted} from "vue";
-	import {useRouter} from 'vue-router'
+	import {useRouter} from "vue-router";
 
-	const router = useRouter()
+	const router = useRouter();
 
 	const currentTime = ref("00:00:00");
 	let timer;
 
-	const session = ref(null)
-	const currentExercise = ref(null)
+	const session = ref(null);
+	const currentExercise = ref(null);
 
 	async function next() {
 		currentExercise.value.sets_done++;
@@ -44,16 +48,12 @@
 			currentExercise.value.completed = true;
 			currentExercise.value.active = false;
 			currentExercise.value.skiped = false;
-			const next = grabNext(session.value.exercise_sessions)
-			if (next == null) {
+			const nextExercise = grabNext(session.value.exercise_sessions);
+			if (nextExercise == null) {
 				session.value.active = false;
-				router.push({
-					name: 'home',
-				});
-
-			}
-			else {
-				currentExercise.value = next;
+				router.push({name: "home"});
+			} else {
+				currentExercise.value = nextExercise;
 				currentExercise.value.active = true;
 				currentExercise.value.sets_done = 1;
 				currentExercise.value.skiped = false;
@@ -76,7 +76,7 @@
 	}
 
 	async function grabSession() {
-		const token = localStorage.getItem('token');
+		const token = localStorage.getItem("token");
 		const url = `${import.meta.env.VITE_API_URL}api/restricted/session`;
 
 		try {
@@ -84,7 +84,7 @@
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": "Bearer " + token
+					Authorization: "Bearer " + token,
 				},
 			});
 			if (!response.ok) {
@@ -93,32 +93,32 @@
 			session.value = await response.json();
 			updateTime();
 			// Grab the active exercise
-			currentExercise.value = session.value.exercise_sessions.find((exercise) => exercise.active);
-			// If no active
+			currentExercise.value = session.value.exercise_sessions.find(
+				(exercise) => exercise.active
+			);
+			// If no active, grab the next
 			if (currentExercise.value == null) {
 				currentExercise.value = grabNext(session.value.exercise_sessions);
-				currentExercise.value.sets_done = 1
-				currentExercise.value.active = true
+				currentExercise.value.sets_done = 1;
+				currentExercise.value.active = true;
 				await update();
 			}
-			//console.log(session.value)
-		}
-		catch (error) {
-			console.log(error)
+		} catch (error) {
+			console.log(error);
 		}
 	}
 
 	function grabNext(list) {
 		list.sort((a, b) => a.exercise.order - b.exercise.order);
 		let result = list.filter((exercise) => !exercise.skiped && !exercise.completed);
-		if (result.length == 0) {
+		if (result.length === 0) {
 			result = list.filter((exercise) => !exercise.completed);
 		}
 		return result.at(0);
 	}
 
 	async function update() {
-		const token = localStorage.getItem('token');
+		const token = localStorage.getItem("token");
 		const url = `${import.meta.env.VITE_API_URL}api/restricted/session/${session.value.id}`;
 
 		try {
@@ -126,19 +126,17 @@
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": "Bearer " + token,
+					Authorization: "Bearer " + token,
 				},
-				body: JSON.stringify(session.value)
+				body: JSON.stringify(session.value),
 			});
 			if (!response.ok) {
 				throw new Error((await response.json()).error);
 			}
 			console.log(await response.json());
+		} catch (error) {
+			console.log(error);
 		}
-		catch (error) {
-			console.log(error)
-		}
-
 	}
 
 	function updateTime() {
@@ -147,7 +145,10 @@
 		const hours = Math.floor(totalSeconds / 3600);
 		const minutes = Math.floor((totalSeconds % 3600) / 60);
 		const seconds = totalSeconds % 60;
-		currentTime.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+		currentTime.value = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+			2,
+			"0"
+		)}:${String(seconds).padStart(2, "0")}`;
 	}
 
 	onMounted(async () => {
@@ -161,3 +162,14 @@
 		clearInterval(timer);
 	});
 </script>
+
+<style scoped>
+	.slide-fade-enter-active {
+		transition: all 0.5s ease;
+	}
+
+	.slide-fade-enter-from {
+		opacity: 0;
+		transform: translateX(20px);
+	}
+</style>
