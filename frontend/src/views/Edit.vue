@@ -5,29 +5,42 @@
 	<div v-else-if="error" class="w-full h-full flex justify-center items-center">
 		<p>Error</p>
 	</div>
-	<div v-else class="w-full h-full">
-		<div class="w-full p-8">
-			<div class="mb-8">
-				<!--INFO-->
-				<fieldset class="fieldset">
-					<legend class="fieldset-legend">Name</legend>
-					<input v-model="workout.name" type="text" class="input w-full" placeholder="Name" />
-				</fieldset>
-				<fieldset class="fieldset">
+	<div v-else class="w-full h-full p-8">
+		<div class="mb-8">
+			<!--INFO-->
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend">Name</legend>
+				<input v-model="workout.name" type="text" class="input w-full" placeholder="Name" />
+			</fieldset>
+			<div class="flex row gap-4">
+				<fieldset class="fieldset w-full">
 					<legend class="fieldset-legend">Note</legend>
 					<input v-model="workout.note" type="text" class="input w-full" placeholder="Note" />
 					<p class="fieldset-label">Not required</p>
 				</fieldset>
+				<fieldset class="fieldset">
+					<legend class="fieldset-legend opacity-0">space</legend>
+					<button class="btn btn-square" @click="copy">
+						<i class="bi bi-share"></i>
+					</button>
+					<p class="fieldset-label opacity-0">space</p>
+				</fieldset>
 			</div>
-			<!--EXERCISE-->
-			<transition-group name="exercise" tag="div" class="w-full">
-				<ExerciseItem v-for="exercise in workout.exercises" :key="exercise.id" :exercise="exercise"
-					:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove"
-					@change="triggerUpdateExercise(exercise)" />
-			</transition-group>
-			<div class="w-full h-32">
+			<transition name="fade">
+				<div v-if="copied" role="alert" class="alert alert-success mt-4">
+					<i class="bi bi-check-circle text-xl"></i>
+					<span>Workout copied to your clipboard</span>
+				</div>
+			</transition>
+		</div>
+		<!--EXERCISE-->
+		<transition-group name="exercise" tag="div" class="w-full">
+			<ExerciseItem v-for="exercise in workout.exercises" :key="exercise.id" :exercise="exercise"
+				:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove"
+				@change="triggerUpdateExercise(exercise)" />
+		</transition-group>
+		<div class="w-full h-32">
 
-			</div>
 		</div>
 		<AddExerciseModal @add-exercise="addExercise" />
 	</div>
@@ -41,15 +54,18 @@
 	import ExerciseItem from '@/components/ExerciseItem.vue'
 
 	const route = useRoute()
+	const id = route.query.id;
 
 	const workout = ref({name: "", note: ""});
 	const loading = ref(true);
 	const error = ref(false);
+	const copied = ref(false);
+	let timeout;
 
-	const id = route.query.id;
 
 	let updateExerciseTimeout = null
 	let updateWorkoutTimeout = null
+
 
 
 	const debouncedUpdates = new Map();
@@ -75,7 +91,16 @@
 		};
 	}
 
-
+	async function copy() {
+		await navigator.clipboard.writeText(`${window.location.origin}/copy?id=${id}`);
+		copied.value = true;
+		if (timeout != null) {
+			clearTimeout(timeout)
+		}
+		timeout = setTimeout(() => {
+			copied.value = false;
+		}, 1500)
+	}
 
 
 	async function moveUp(exercise) {
@@ -313,3 +338,15 @@
 
 
 </script>
+
+<style scoped>
+	.fade-enter-active,
+	.fade-leave-active {
+		transition: opacity 0.5s ease;
+	}
+
+	.fade-enter-from,
+	.fade-leave-to {
+		opacity: 0;
+	}
+</style>

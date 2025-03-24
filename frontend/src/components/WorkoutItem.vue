@@ -11,8 +11,8 @@
 				<button class="btn btn-square " @click.stop="emitEdit">
 					<i class="bi bi-pencil text-xl"></i>
 				</button>
-				<button class="btn btn-square" @click.stop="promptRemove">
-					<i class="bi bi-trash text-xl text-error"></i>
+				<button class="btn btn-square btn-error" @click.stop="promptRemove">
+					<i class="bi bi-trash text-xl"></i>
 				</button>
 			</div>
 		</button>

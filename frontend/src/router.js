@@ -5,6 +5,7 @@ import Edit from './views/Edit.vue';
 import Register from './views/Register.vue';
 import Session from './views/Session.vue';
 import Settings from './views/Settings.vue';
+import Copy from './views/Copy.vue';
 import { jwtDecode } from 'jwt-decode';
 
 const routes = [
@@ -14,6 +15,7 @@ const routes = [
 	{ path: '/register', name: 'register', component: Register },
 	{ path: '/session', name: 'session', component: Session, meta: { requiresAuth: true } },
 	{ path: '/settings', name: 'settings', component: Settings, meta: { requiresAuth: true } },
+	{ path: '/copy', name: 'copy', component: Copy, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
