@@ -14,7 +14,7 @@
 			</button>
 		</router-link>
 
-		<router-link to="/">
+		<router-link to="/stats" :class="{ 'dock-active': (page == 'stats') }">
 			<button class="flex flex-col justify-between items-center ">
 				<i class="bi bi-clipboard-data text-xl"></i>
 				<span class="dock-label">Stats</span>
@@ -22,7 +22,7 @@
 		</router-link>
 
 
-		<router-link to="/">
+		<router-link to="/settings" :class="{ 'dock-active': (page == 'settings') }">
 			<button class="flex flex-col justify-between items-center">
 				<i class="bi bi-gear text-xl"></i>
 				<span class="dock-label">Settings</span>

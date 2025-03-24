@@ -1,9 +1,11 @@
 <template>
-	<div class="fixed px-8 bottom-24 w-full">
-		<button class="w-full btn btn-primary shadow" onclick="addWorkout.showModal()">
-			<i class="bi bi-plus-square-dotted text-2xl"></i>
-		</button>
-	</div>
+	<Teleport to="body">
+		<div class="fixed px-8 bottom-24 w-full">
+			<button class="w-full btn btn-primary" onclick="addWorkout.showModal()">
+				<i class="bi bi-plus-square-dotted text-2xl"></i>
+			</button>
+		</div>
+	</Teleport>
 
 	<dialog id="addWorkout" class="modal modal-bottom sm:modal-middle">
 		<div class="modal-box">

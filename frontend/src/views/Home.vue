@@ -2,17 +2,15 @@
 	<div v-if="loading" class="w-full h-full flex justify-center items-center">
 		<p>Loading...</p>
 	</div>
-	<div v-else class="w-full h-full">
-		<div class="w-full p-8">
-			<div class="mb-8">
-				<h1 class="text-left text-2xl font-bold">Hello {{name}}! </h1>
-				<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
-			</div>
-			<transition-group name="workout" tag="div" class="w-full">
-				<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout" @click="startSession"
-					@edit="editWorkout" @remove="removeWorkout" />
-			</transition-group>
+	<div v-else class="w-full h-full p-8">
+		<div class="mb-8">
+			<h1 class="text-left text-2xl font-bold">Hello {{name}}! </h1>
+			<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
 		</div>
+		<transition-group name="workout" tag="div" class="w-full">
+			<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout" @click="startSession"
+				@edit="editWorkout" @remove="removeWorkout" />
+		</transition-group>
 	</div>
 	<AddWorkoutModal @add-workout="addWorkout" />
 </template>

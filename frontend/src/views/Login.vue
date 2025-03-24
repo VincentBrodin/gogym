@@ -8,7 +8,8 @@
 
 			<p v-if="error != null" class="text-error mb-4 text-sm font-bold">{{ error }}</p>
 
-			<button type="submit" class="btn btn-primary btn-outline w-full" :disabled="loading">Login</button>
+			<p class="mb-4 text-sm opacity-60">No account? <router-link to="/register" class="underline text-primary">Create one</router-link></p>
+			<button type="submit" class="btn btn-primary w-full" :disabled="loading">Login</button>
 		</form>
 	</div>
 </template>

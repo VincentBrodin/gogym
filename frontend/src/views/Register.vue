@@ -3,11 +3,15 @@
 		<form class="container-sm border border-base-300 rounded-lg w-full bg-base-200 p-8" @submit.prevent="submit">
 			<h1 class="w-full text-center text-2xl font-bold">Create account</h1>
 
-			<ValidationInput label="Username" v-model="username" type="text" :error="unameErr" />
+			<ValidationInput label="Username" v-model="username" type="text" :error="usernameErr" />
 			<ValidationInput label="Email" v-model="email" type="email" :error="emailErr" />
-			<ValidationInput label="Password" v-model="password" type="password" :error="pswdErr" />
-			<ValidationInput label="Repeat Password" v-model="repeatPassword" type="password" :error="repswdErr" />
-			<button type="submit" class="btn btn-primary btn-outline w-full" :disabled="loading">Register</button>
+			<ValidationInput label="Password" v-model="password" type="password" :error="passwordErr" />
+			<ValidationInput label="Repeat Password" v-model="repeatPassword" type="password"
+				:error="repeatPasswordErr" />
+
+			<p class="mb-4 text-sm opacity-60">Already have an account? <router-link to="/login"
+					class="underline text-primary">Sign in</router-link></p>
+			<button type="submit" class="btn btn-primary w-full" :disabled="loading">Register</button>
 		</form>
 	</div>
 </template>
@@ -21,16 +25,16 @@
 	const route = useRoute()
 
 	const username = ref("");
-	const unameErr = ref(null);
+	const usernameErr = ref(null);
 
 	const email = ref("");
 	const emailErr = ref(null);
 
 	const password = ref("");
-	const pswdErr = ref(null);
+	const passwordErr = ref(null);
 
 	const repeatPassword = ref("");
-	const repswdErr = ref(null);
+	const repeatPasswordErr = ref(null);
 
 	const error = ref(null);
 
@@ -45,7 +49,7 @@
 		try {
 			loading.value = true;
 			if (password.value != repeatPassword.value) {
-				repswdErr.value = "Passwords does not match";
+				repeatPasswordErr.value = "Passwords does not match";
 				loading.value = false;
 				return;
 			}
@@ -68,14 +72,14 @@
 				router.push(redirectPath);
 			} else {
 				const output = await response.json();
-				if (output.uname) {
-					unameErr.value = output.uname;
+				if (output.username) {
+					usernameErr.value = output.username;
 				}
 				if (output.email) {
 					emailErr.value = output.email;
 				}
-				if (output.pwsd) {
-					pswdErr.value = output.email;
+				if (output.password) {
+					passwordErr.value = output.password;
 				}
 				console.log("Failed to register");
 			}

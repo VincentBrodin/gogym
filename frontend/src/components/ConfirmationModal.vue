@@ -5,7 +5,7 @@
 				<h3 class="text-lg font-bold">{{promptText}}</h3>
 				<p class="opacity-60">{{detailText}}</p>
 				<form method="dialog" class="w-full" @submit.prevent="confirmAction">
-					<button type="submit" class="btn btn-primary w-full mt-4">{{confirmText}}</button>
+					<button type="submit" class="btn btn-error w-full mt-4">{{confirmText}}</button>
 				</form>
 			</div>
 			<form method="dialog" class="modal-backdrop">
