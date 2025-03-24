@@ -88,6 +88,7 @@ func spawnServer(config Config) *echo.Echo {
 	restricted.GET("/workouts", api.GetAllWorkouts)
 	restricted.GET("/workout/:id", api.GetWorkout)
 	restricted.PUT("/workout", api.AddWorkout)
+	restricted.PUT("/workout/copy/:id", api.CopyWorkout)
 	restricted.PATCH("/workout/:id", api.EditWorkout)
 	restricted.DELETE("/workout/:id", api.DeleteWorkout)
 

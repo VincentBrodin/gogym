@@ -2,6 +2,7 @@ package api
 
 import (
 	"backend/internal/models"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -80,6 +81,73 @@ func AddWorkout(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, workout.CreateResponse())
+}
+
+func CopyWorkout(c echo.Context) error {
+	workoutIDStr := c.Param("id")
+	workoutID, err := strconv.ParseUint(workoutIDStr, 10, 32)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid ID")
+	}
+
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+
+	var originalWorkout models.Workout
+	if err := db.Preload("Exercises", "deleted = ?", false).Where("id = ? AND deleted = ?", workoutID, false).First(&originalWorkout).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	now := time.Now().UTC()
+	newWorkout := models.Workout{
+		UserID: claims.ID,
+
+		Name: fmt.Sprintf("%s - Copy", originalWorkout.Name),
+		Note: originalWorkout.Note,
+
+		CreatedAt: now,
+		UpdatedAt: now,
+		LastDone:  now,
+	}
+
+	if err := db.Create(&newWorkout).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	// Begin a transaction
+	err = db.Transaction(func(tx *gorm.DB) error {
+		for _, oldExercise := range originalWorkout.Exercises {
+			newExercise := models.Exercise{
+				UserID:    claims.ID,
+				WorkoutID: newWorkout.ID,
+
+				Name: oldExercise.Name,
+				Note: oldExercise.Note,
+
+				Order: oldExercise.Order,
+
+				Sets:          oldExercise.Sets,
+				Reps:          oldExercise.Reps,
+				RepsInReserve: oldExercise.RepsInReserve,
+
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+			if err := tx.Create(&newExercise).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, newWorkout.CreateResponse())
 }
 
 func EditWorkout(c echo.Context) error {
