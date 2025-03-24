@@ -81,6 +81,7 @@ func resetDatabase() error {
 		Note:      "some info about dummy workout",
 		Sets:      2,
 		Reps:      8,
+		RepsInReserve:      1,
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}

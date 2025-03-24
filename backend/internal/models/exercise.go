@@ -16,8 +16,9 @@ type Exercise struct {
 
 	Order int `gorm:"not null"`
 
-	Sets int `gorm:"not null"`
-	Reps int `gorm:"not null"`
+	Sets          int `gorm:"not null;default:3"`
+	Reps          int `gorm:"not null;default:8"`
+	RepsInReserve int `gorm:"not null;default:0"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -34,8 +35,9 @@ type ExerciseResponse struct {
 
 	Order int `json:"order"`
 
-	Sets int `json:"sets"`
-	Reps int `json:"reps"`
+	Sets          int `json:"sets"`
+	Reps          int `json:"reps"`
+	RepsInReserve int `json:"rir"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -51,8 +53,9 @@ func (e *Exercise) CreateResponse() ExerciseResponse {
 
 		Order: e.Order,
 
-		Sets: e.Sets,
-		Reps: e.Reps,
+		Sets:          e.Sets,
+		Reps:          e.Reps,
+		RepsInReserve: e.RepsInReserve,
 
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,

@@ -100,7 +100,7 @@ func EditWorkout(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workout models.Workout
-	if err := db.Where("id = ? AND user_id = ? AND deleted", workoutID, claims.ID, false).First(&workout).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ? AND deleted = ?", workoutID, claims.ID, false).First(&workout).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 

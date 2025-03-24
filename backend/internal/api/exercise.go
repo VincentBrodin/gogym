@@ -20,8 +20,9 @@ type AddExerciseForm struct {
 
 	Order int `json:"order"`
 
-	Sets int `json:"sets"`
-	Reps int `json:"reps"`
+	Sets          int `json:"sets"`
+	Reps          int `json:"reps"`
+	RepsInReserve int `json:"rir"`
 }
 
 func GetExercise(c echo.Context) error {
@@ -69,8 +70,9 @@ func AddExercise(c echo.Context) error {
 
 		Order: len(exercises),
 
-		Sets: form.Sets,
-		Reps: form.Reps,
+		Sets:          form.Sets,
+		Reps:          form.Reps,
+		RepsInReserve: form.RepsInReserve,
 
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -112,6 +114,7 @@ func EditExercise(c echo.Context) error {
 	exercise.Note = form.Note
 	exercise.Sets = form.Sets
 	exercise.Reps = form.Reps
+	exercise.RepsInReserve = form.RepsInReserve
 	exercise.UpdatedAt = time.Now().UTC()
 
 	if err := db.Save(&exercise).Error; err != nil {
@@ -161,6 +164,7 @@ func EditAllExercises(c echo.Context) error {
 			exercise.Order = form.Order
 			exercise.Sets = form.Sets
 			exercise.Reps = form.Reps
+			exercise.RepsInReserve = form.RepsInReserve
 			exercise.UpdatedAt = time.Now().UTC()
 		}
 	}
