@@ -2,7 +2,6 @@ package api
 
 import (
 	"backend/internal/models"
-	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -14,9 +13,9 @@ import (
 )
 
 type AddExerciseForm struct {
-	ID        uint    `json:"id"`
-	WorkoutID uint    `json:"workout_id"`
-	Name      string  `json:"name"`
+	ID        uint   `json:"id"`
+	WorkoutID uint   `json:"workout_id"`
+	Name      string `json:"name"`
 	Note      string `json:"note"`
 
 	Order int `json:"order"`
@@ -38,7 +37,7 @@ func GetExercise(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var exercise models.Exercise
-	if err := db.Where("id = ? AND user_id = ?", exerciseID, claims.ID).First(&exercise).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ? AND deleted = ?", exerciseID, claims.ID, false).First(&exercise).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -57,7 +56,7 @@ func AddExercise(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var exercises []models.Exercise
-	if err := db.Where("workout_id = ? AND user_id = ?", form.WorkoutID, claims.ID).Find(&exercises).Error; err != nil {
+	if err := db.Where("workout_id = ? AND user_id = ? AND deleted = ?", form.WorkoutID, claims.ID, false).Find(&exercises).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -104,7 +103,7 @@ func EditExercise(c echo.Context) error {
 
 	// Grab exercise
 	var exercise models.Exercise
-	if err := db.Where("id = ? AND user_id = ?", exerciseID, claims.ID).First(&exercise).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ? AND deleted = ?", exerciseID, claims.ID, false).First(&exercise).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -145,7 +144,7 @@ func EditAllExercises(c echo.Context) error {
 
 	// Grab all exercises
 	var exercises []models.Exercise
-	if err := db.Where("workout_id = ? AND user_id = ?", workoutID, claims.ID).Find(&exercises).Error; err != nil {
+	if err := db.Where("workout_id = ? AND user_id = ? AND deleted = ?", workoutID, claims.ID, false).Find(&exercises).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
@@ -209,17 +208,19 @@ func DeleteExercise(c echo.Context) error {
 
 	// Grab the exercise to remove
 	var exercise models.Exercise
-	if err := db.Where("id = ? AND user_id = ?", exerciseID, claims.ID).First(&exercise).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ? AND deleted = ?", exerciseID, claims.ID, false).First(&exercise).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
-	if err := db.Delete(&exercise).Error; err != nil {
+	exercise.Deleted = true
+	exercise.DeletedAt = time.Now().UTC()
+	if err := db.Save(&exercise).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	// Grab all remaning exercises
 	var exercises []models.Exercise
-	if err := db.Where("workout_id = ? AND user_id = ?", exercise.WorkoutID, claims.ID).Find(&exercises).Error; err != nil {
+	if err := db.Where("workout_id = ? AND user_id = ? AND deleted = ?", exercise.WorkoutID, claims.ID, false).Find(&exercises).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
@@ -246,7 +247,6 @@ func DeleteExercise(c echo.Context) error {
 	responses := make([]models.ExerciseResponse, len(exercises))
 	for i := range responses {
 		responses[i] = exercises[i].CreateResponse()
-		fmt.Printf("%s %d\n", responses[i].Name, responses[i].Order)
 	}
 
 	return c.JSON(http.StatusOK, responses)

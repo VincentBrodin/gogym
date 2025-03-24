@@ -17,7 +17,7 @@ func GetAccount(c echo.Context) error {
 
 	db := c.Get("db").(*gorm.DB)
 	var user models.User
-	if err := db.Preload("Workouts.Exercises").Where("id = ?", claims.ID).First(&user).Error; err != nil {
+	if err := db.Preload("Workouts.Exercises", "deleted = ?", false).Where("id = ?", claims.ID).First(&user).Error; err != nil {
 		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
 	}
 

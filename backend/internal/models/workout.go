@@ -1,8 +1,6 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
 type Workout struct {
 	ID uint `gorm:"primaryKey"`
@@ -10,7 +8,8 @@ type Workout struct {
 	UserID uint  `gorm:"not null"`
 	User   *User `gorm:"foreignKey:UserID"`
 
-	Exercises []Exercise
+	Exercises       []Exercise       `gorm:"foreignKey:WorkoutID"`
+	WorkoutSessions []WorkoutSession `gorm:"foreignKey:WorkoutID"`
 
 	Name string `gorm:"not null"`
 	Note string
@@ -18,6 +17,8 @@ type Workout struct {
 	LastDone  time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt time.Time
+	Deleted   bool `gorm:"default:false"`
 }
 
 type WorkoutResponse struct {

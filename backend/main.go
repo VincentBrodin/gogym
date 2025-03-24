@@ -48,7 +48,6 @@ func spawnServer(config Config) *echo.Echo {
 			if err != nil {
 				return false, err
 			}
-			fmt.Printf("Request from %s\n", origin)
 			host := u.Hostname()
 			return host == "localhost" || host == "127.0.0.1", nil
 		}, AllowHeaders: []string{"*"},

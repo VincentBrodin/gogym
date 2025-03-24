@@ -2,7 +2,6 @@ package api
 
 import (
 	"backend/internal/models"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -33,8 +32,14 @@ func StartSession(c echo.Context) error {
 	}
 
 	var workout models.Workout
-	if err := db.Preload("Exercises").Where("id = ? AND user_id = ?", workoutID, claims.ID).First(&workout).Error; err != nil {
+	if err := db.Preload("Exercises", "deleted = ?", false).Where("id = ? AND user_id = ?", workoutID, claims.ID).First(&workout).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	workout.LastDone = time.Now().UTC()
+
+	if err := db.Save(&workout).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	exerciseSessions := make([]models.ExerciseSession, len(workout.Exercises))
@@ -90,7 +95,7 @@ func EditSession(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSession models.WorkoutSession
-	if err := db.Preload("Workout").Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -105,7 +110,6 @@ func EditSession(c echo.Context) error {
 
 	for _, newExercise := range form.ExerciseSessions {
 		if oldExercise, ok := exerciseMap[newExercise.ID]; ok {
-			fmt.Println(newExercise.Exercise.Name)
 			oldExercise.Completed = newExercise.Completed
 			oldExercise.Skiped = newExercise.Skiped
 			oldExercise.Active = newExercise.Active
@@ -139,7 +143,7 @@ func GetCurrentSession(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSession models.WorkoutSession
-	if err := db.Preload("Workout").Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise").Where("active = ? AND user_id = ?", true, claims.ID).First(&workoutSession).Error; err != nil {
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("active = ? AND user_id = ?", true, claims.ID).First(&workoutSession).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 

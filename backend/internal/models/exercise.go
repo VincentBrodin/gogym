@@ -21,6 +21,8 @@ type Exercise struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt time.Time
+	Deleted   bool `gorm:"default:false"`
 }
 
 type ExerciseResponse struct {
@@ -89,14 +91,14 @@ type ExerciseSessionResponse struct {
 
 func (es *ExerciseSession) CreateResponse() ExerciseSessionResponse {
 	return ExerciseSessionResponse{
-		ID:               es.ID,
+		ID: es.ID,
 
 		Exercise:         es.Exercise.CreateResponse(),
 		WorkoutSessionID: es.WorkoutSessionID,
 
-		Completed:        es.Completed,
-		Skiped:           es.Skiped,
-		Active:           es.Active,
+		Completed: es.Completed,
+		Skiped:    es.Skiped,
+		Active:    es.Active,
 
 		SetsDone: es.SetsDone,
 	}
