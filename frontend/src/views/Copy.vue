@@ -7,11 +7,14 @@
 	</div>
 	<div v-else class="w-full h-full p-8">
 		<h1 class="text-2xl font-bold mb-8">Do you want to copy {{workout.name}}?</h1>
-		<div v-for="exercise in workout.exercises"
-			class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 border">
-			<h1 class="text-xl text-left font-semibold">{{ exercise.name }}</h1>
-			<p class="text-xs text-left opacity-60">{{ exercise.note }}</p>
-		</div>
+		<ul class="w-full my-8">
+			<li v-for="exercise in workout.exercises">
+				{{ exercise.name }}
+				<span v-if="exercise.note != '' && exercise.note != null"> - 
+					<span class="opacity-60">{{exercise.note}}</span>
+				</span>
+			</li>
+		</ul>
 		<button class="btn btn-primary w-full mb-4" @click="copyWorkout">Copy</button>
 		<router-link to="/" class="btn w-full">No</router-link>
 	</div>

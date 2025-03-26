@@ -17,16 +17,19 @@ body,
 }
 
 .exercise-move,
+.session-move,
 .workout-move {
 	transition: transform 0.5s ease 0.2s;
 }
 
 .exercise-leave-active,
+.session-leave-active,
 .workout-leave-active {
 	transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
 }
 
 .exercise-leave-to,
+.session-leave-to,
 .workout-leave-to {
 	opacity: 0;
 	transform: translateX(50px);

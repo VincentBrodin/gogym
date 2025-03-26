@@ -6,16 +6,18 @@ import Register from './views/Register.vue';
 import Session from './views/Session.vue';
 import Settings from './views/Settings.vue';
 import Copy from './views/Copy.vue';
+import Stats from './views/Stats.vue';
 import { jwtDecode } from 'jwt-decode';
 
 const routes = [
-	{ path: '/', name: 'home', component: Home, meta: { requiresAuth: true } },
-	{ path: '/edit', name: 'edit', component: Edit, meta: { requiresAuth: true } },
 	{ path: '/login', name: 'login', component: Login },
 	{ path: '/register', name: 'register', component: Register },
+	{ path: '/', name: 'home', component: Home, meta: { requiresAuth: true } },
+	{ path: '/edit', name: 'edit', component: Edit, meta: { requiresAuth: true } },
 	{ path: '/session', name: 'session', component: Session, meta: { requiresAuth: true } },
 	{ path: '/settings', name: 'settings', component: Settings, meta: { requiresAuth: true } },
 	{ path: '/copy', name: 'copy', component: Copy, meta: { requiresAuth: true } },
+	{ path: '/stats', name: 'stats', component: Stats, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

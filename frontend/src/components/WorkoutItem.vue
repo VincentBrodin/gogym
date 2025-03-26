@@ -4,7 +4,7 @@
 			<div>
 				<h1 class="text-xl text-left font-semibold">{{ workout.name }}</h1>
 				<p class="text-xs text-left opacity-60">{{ workout.note }}</p>
-				<p class="text-xs text-left opacity-60">Last did: {{timeAgo}}</p>
+				<p class="text-xs text-left opacity-60">{{timeAgo}}</p>
 
 			</div>
 			<div class="flex flex-row items-center justify-end gap-4">
