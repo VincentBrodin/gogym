@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"backend/internal/api"
 	"backend/internal/models"
@@ -59,8 +60,11 @@ func spawnServer(config Config) *echo.Echo {
 	})
 
 	// Routers
-	e.Static("/", config.ContentDir)
-	e.File("/", filepath.Join(config.ContentDir, "index.html"))
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:  config.ContentDir,
+		Index: "index.html",
+		HTML5: true,
+	}))
 
 	group := e.Group("/api")
 
@@ -83,6 +87,7 @@ func spawnServer(config Config) *echo.Echo {
 
 	restricted.PUT("/session/:id", api.StartSession)
 	restricted.GET("/session", api.GetCurrentSession)
+	restricted.GET("/sessions", api.GetAllSessions)
 	restricted.PATCH("/session/:id", api.EditSession)
 
 	restricted.GET("/workouts", api.GetAllWorkouts)
@@ -103,6 +108,13 @@ func spawnServer(config Config) *echo.Echo {
 		claims := user.Claims.(*models.JwtUserClaims)
 		name := claims.Username
 		return c.String(http.StatusOK, "Welcome "+name+"!")
+	})
+
+	e.GET("/*", func(c echo.Context) error {
+		if strings.HasPrefix(c.Request().URL.Path, "/api") {
+			return echo.ErrNotFound
+		}
+		return c.File(filepath.Join(config.ContentDir, "index.html"))
 	})
 
 	// Start

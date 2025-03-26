@@ -44,13 +44,10 @@ func GetWorkout(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Invalid ID")
 	}
 
-	userToken := c.Get("user").(*jwt.Token)
-	claims := userToken.Claims.(*models.JwtUserClaims)
-
 	db := c.Get("db").(*gorm.DB)
 
 	var workout models.Workout
-	if err := db.Preload("Exercises", "deleted = ?", false).Where("id = ? AND user_id = ? AND deleted = ?", workoutID, claims.ID, false).First(&workout).Error; err != nil {
+	if err := db.Preload("Exercises", "deleted = ?", false).Where("id = ? AND deleted = ?", workoutID, false).First(&workout).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 

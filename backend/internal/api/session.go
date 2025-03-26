@@ -45,7 +45,7 @@ func StartSession(c echo.Context) error {
 	exerciseSessions := make([]models.ExerciseSession, len(workout.Exercises))
 	for i, exercise := range workout.Exercises {
 		exerciseSessions[i] = models.ExerciseSession{
-			UserID: claims.ID,
+			UserID:     claims.ID,
 			ExerciseID: exercise.ID,
 			Exercise:   &exercise,
 
@@ -135,6 +135,25 @@ func EditSession(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, workoutSession.CreateResponse())
+}
+
+func GetAllSessions(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+
+	var workoutSessions []models.WorkoutSession
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("active = ? AND user_id = ?", false, claims.ID).Find(&workoutSessions).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	response := make([]models.WorkoutSessionResponse, len(workoutSessions))
+	for i, session := range workoutSessions {
+		response[i] = session.CreateResponse()
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func GetCurrentSession(c echo.Context) error {

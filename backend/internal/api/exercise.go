@@ -32,13 +32,10 @@ func GetExercise(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 
-	userToken := c.Get("user").(*jwt.Token)
-	claims := userToken.Claims.(*models.JwtUserClaims)
-
 	db := c.Get("db").(*gorm.DB)
 
 	var exercise models.Exercise
-	if err := db.Where("id = ? AND user_id = ? AND deleted = ?", exerciseID, claims.ID, false).First(&exercise).Error; err != nil {
+	if err := db.Where("id = ? AND deleted = ?", exerciseID, false).First(&exercise).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
