@@ -169,3 +169,40 @@ func GetCurrentSession(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, workoutSession.CreateResponse())
 }
+
+func DeleteSession(c echo.Context) error {
+	sessionIDStr := c.Param("id")
+	sessionID, err := strconv.ParseUint(sessionIDStr, 10, 32)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid ID")
+	}
+
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+
+	var workoutSession models.WorkoutSession
+	if err := db.Preload("ExerciseSessions").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		for i := range workoutSession.ExerciseSessions {
+			if err := tx.Delete(&workoutSession.ExerciseSessions[i]).Error; err != nil {
+				return err // transaction will be rolled back
+			}
+		}
+
+		if err := tx.Delete(&workoutSession).Error; err != nil {
+			return err
+		}
+
+		return nil // commit the transaction
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, "DELETED")
+}
