@@ -17,10 +17,6 @@
 	const sessions = ref(null);
 	const loading = ref(true);
 
-	function removeSession(session) {
-		sessions.value.splice(sessions.value.indexOf(session), 1);
-	}
-
 	async function loadSessions() {
 		const token = localStorage.getItem('token');
 		const url = `${import.meta.env.VITE_API_URL}api/restricted/sessions`;
@@ -38,6 +34,33 @@
 			}
 			sessions.value = await response.json();
 			sessions.value.sort((a, b) => Date.parse(b.endend_at) - Date.parse(a.endend_at));
+		}
+		catch (error) {
+			console.error('Error loading workouts:', error);
+		} finally {
+			loading.value = false;
+		}
+	}
+
+	async function removeSession(session) {
+		sessions.value.splice(sessions.value.indexOf(session), 1);
+
+		const token = localStorage.getItem('token');
+		const url = `${import.meta.env.VITE_API_URL}api/restricted/session/${session.id}`;
+
+		try {
+
+			const response = await fetch(url, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + token
+				},
+			});
+			if (!response.ok) {
+				throw new Error((await response.json()).error);
+			}
+			console.log(await response.json());
 		}
 		catch (error) {
 			console.error('Error loading workouts:', error);
