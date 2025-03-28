@@ -36,7 +36,7 @@ func spawnServer(config Config) *echo.Echo {
 	}
 
 	// Register models
-	db.AutoMigrate(&models.User{}, &models.Workout{}, &models.WorkoutSession{}, &models.Exercise{}, &models.ExerciseSession{})
+	db.AutoMigrate(&models.User{}, &models.Workout{}, &models.WorkoutSession{}, &models.Exercise{}, &models.ExerciseSession{}, &models.ExerciseWeight{})
 
 	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

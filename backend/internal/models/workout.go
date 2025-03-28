@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Workout struct {
 	ID uint `gorm:"primaryKey"`
@@ -44,11 +46,14 @@ func (w *Workout) CreateResponse() WorkoutResponse {
 		LastDone:  w.LastDone,
 		CreatedAt: w.CreatedAt,
 		UpdatedAt: w.UpdatedAt,
-		Exercises: make([]ExerciseResponse, len(w.Exercises)),
+		Exercises: []ExerciseResponse{},
 	}
 
-	for i, exercise := range w.Exercises {
-		response.Exercises[i] = exercise.CreateResponse()
+	if w.Exercises != nil {
+		response.Exercises = make([]ExerciseResponse, len(w.Exercises))
+		for i, exercise := range w.Exercises {
+			response.Exercises[i] = exercise.CreateResponse()
+		}
 	}
 
 	return response
@@ -91,14 +96,16 @@ func (ws *WorkoutSession) CreateResponse() WorkoutSessionResponse {
 
 		Active: ws.Active,
 
-		StartedAt: ws.StartedAt,
-		EndedAt:   ws.EndedAt,
-
-		ExerciseSessions: make([]ExerciseSessionResponse, len(ws.ExerciseSessions)),
+		StartedAt:        ws.StartedAt,
+		EndedAt:          ws.EndedAt,
+		ExerciseSessions: []ExerciseSessionResponse{},
 	}
 
-	for i, exerciseSession := range ws.ExerciseSessions {
-		response.ExerciseSessions[i] = exerciseSession.CreateResponse()
+	if ws.ExerciseSessions != nil {
+		response.ExerciseSessions = make([]ExerciseSessionResponse, len(ws.ExerciseSessions))
+		for i, exerciseSession := range ws.ExerciseSessions {
+			response.ExerciseSessions[i] = exerciseSession.CreateResponse()
+		}
 	}
 
 	return response

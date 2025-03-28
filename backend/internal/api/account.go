@@ -122,6 +122,10 @@ func DeleteAccount(c echo.Context) error {
 	}
 
 	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("user_id = ?", user.ID).Delete(&models.ExerciseWeight{}).Error; err != nil {
+			return err
+		}
+
 		if err := tx.Where("user_id = ?", user.ID).Delete(&models.ExerciseSession{}).Error; err != nil {
 			return err
 		}

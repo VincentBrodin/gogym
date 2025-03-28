@@ -26,6 +26,7 @@ type Exercise struct {
 	Deleted   bool `gorm:"default:false"`
 
 	ExerciseSessions []ExerciseSession `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
+	ExerciseWeights  []ExerciseWeight  `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
 }
 
 type ExerciseResponse struct {
@@ -43,6 +44,8 @@ type ExerciseResponse struct {
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+
+	ExerciseWeights []ExerciseWeight `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
 }
 
 func (e *Exercise) CreateResponse() ExerciseResponse {
@@ -82,6 +85,8 @@ type ExerciseSession struct {
 	Active    bool
 
 	SetsDone int
+
+	ExerciseWeights []ExerciseWeight `gorm:"foreignKey:ExerciseSessionID;constraint:OnDelete:CASCADE;"`
 }
 
 type ExerciseSessionResponse struct {
@@ -94,11 +99,13 @@ type ExerciseSessionResponse struct {
 	Skiped    bool `json:"skiped"`
 	Active    bool `json:"active"`
 
-	SetsDone int `json:"sets_done"`
+	SetsDone        int                      `json:"sets_done"`
+	ExerciseWeights []ExerciseWeightResponse `json:"exercise_weights"`
 }
 
 func (es *ExerciseSession) CreateResponse() ExerciseSessionResponse {
-	return ExerciseSessionResponse{
+
+	response := ExerciseSessionResponse{
 		ID: es.ID,
 
 		Exercise:         es.Exercise.CreateResponse(),
@@ -108,7 +115,54 @@ func (es *ExerciseSession) CreateResponse() ExerciseSessionResponse {
 		Skiped:    es.Skiped,
 		Active:    es.Active,
 
-		SetsDone: es.SetsDone,
+		SetsDone:        es.SetsDone,
+		ExerciseWeights: []ExerciseWeightResponse{},
+	}
+	if es.ExerciseWeights != nil {
+		response.ExerciseWeights = make([]ExerciseWeightResponse, len(es.ExerciseWeights))
+		for i := range len(es.ExerciseWeights) {
+			response.ExerciseWeights[i] = es.ExerciseWeights[i].CreateResponse()
+		}
 	}
 
+	return response
+
+}
+
+type ExerciseWeight struct {
+	ID uint `gorm:"primaryKey"`
+
+	UserID uint  `gorm:"not null"`
+	User   *User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	ExerciseID uint      `gorm:"not null"`
+	Exercise   *Exercise `gorm:"foreignKey:ExerciseID;constraint:OnDelete:CASCADE;"`
+
+	ExerciseSessionID uint             `gorm:"not null"`
+	ExerciseSession   *ExerciseSession `gorm:"foreignKey:ExerciseSessionID;constraint:OnDelete:CASCADE;"`
+
+	Set    int     `gorm:"not null"`
+	Weight float64 `gorm:"not null"`
+}
+
+type ExerciseWeightResponse struct {
+	ID uint `json:"id"`
+
+	ExerciseId        uint `json:"exercise_id"`
+	ExerciseSessionID uint `json:"exercise_session_id"`
+
+	Set    int     `json:"set"`
+	Weight float64 `json:"weight"`
+}
+
+func (ew *ExerciseWeight) CreateResponse() ExerciseWeightResponse {
+	return ExerciseWeightResponse{
+		ID: ew.ID,
+
+		ExerciseId:        ew.ExerciseID,
+		ExerciseSessionID: ew.ExerciseSessionID,
+
+		Set:    ew.Set,
+		Weight: ew.Weight,
+	}
 }

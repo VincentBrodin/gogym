@@ -2,7 +2,11 @@ package api
 
 import (
 	"backend/internal/models"
+	"fmt"
 	"net/http"
+	"sort"
+
+	// "sort"
 	"strconv"
 	"time"
 
@@ -36,46 +40,83 @@ func StartSession(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
-	workout.LastDone = time.Now().UTC()
-
-	if err := db.Save(&workout).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-
-	exerciseSessions := make([]models.ExerciseSession, len(workout.Exercises))
-	for i, exercise := range workout.Exercises {
-		exerciseSessions[i] = models.ExerciseSession{
-			UserID:     claims.ID,
-			ExerciseID: exercise.ID,
-			Exercise:   &exercise,
-
-			Completed: false,
-			Skiped:    false,
-			Active:    false,
-
-			SetsDone: 0,
-		}
-	}
+	now := time.Now().UTC()
+	workout.LastDone = now
 
 	workoutSession := models.WorkoutSession{
 		UserID: claims.ID,
 
 		WorkoutID: workout.ID,
-		Workout:   &workout,
 
 		Active: true,
 
-		StartedAt: time.Now().UTC(),
-		EndedAt:   time.Now().UTC(),
-
-		ExerciseSessions: exerciseSessions,
+		StartedAt:        now,
+		EndedAt:          now,
+		ExerciseSessions: []models.ExerciseSession{},
 	}
 
-	if err := db.Create(&workoutSession).Error; err != nil {
+	err = db.Transaction(func(tx *gorm.DB) error {
+
+		if err := db.Save(&workout).Error; err != nil {
+			return err
+		}
+
+		if err := db.Create(&workoutSession).Error; err != nil {
+			return err
+		}
+
+		for _, exercise := range workout.Exercises {
+			exerciseSession := models.ExerciseSession{
+				UserID:           claims.ID,
+				ExerciseID:       exercise.ID,
+				WorkoutSessionID: workoutSession.ID,
+
+				Completed: false,
+				Skiped:    false,
+				Active:    false,
+
+				SetsDone:        0,
+				ExerciseWeights: []models.ExerciseWeight{},
+			}
+			if err := db.Create(&exerciseSession).Error; err != nil {
+				return err
+			}
+
+			fmt.Println(exerciseSession.ID)
+			var weight float64 = 0
+			var lastWeight models.ExerciseWeight
+			if err := db.Joins("JOIN exercises ON exercises.id = exercise_weights.exercise_id").
+				Where("exercises.name = ? AND exercise_weights.user_id = ?", exercise.Name, claims.ID).
+				Order("exercise_weights.id DESC").
+				First(&lastWeight).Error; err == nil {
+				weight = lastWeight.Weight
+			}
+			for j := range exercise.Sets {
+				exerciseWeight := models.ExerciseWeight{
+					UserID:            claims.ID,
+					ExerciseID:        exercise.ID,
+					ExerciseSessionID: exerciseSession.ID,
+					Set:               j + 1,
+					Weight:            weight,
+				}
+				if err := db.Create(&exerciseWeight).Error; err != nil {
+					return err
+				}
+			}
+
+		}
+		return nil // commit the transaction
+	})
+
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, workoutSession.CreateResponse())
+	var workoutSessionTotal models.WorkoutSession
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Preload("ExerciseSessions.ExerciseWeights").Where("id = ? AND user_id = ?", workoutSession.ID, claims.ID).First(&workoutSessionTotal).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, workoutSessionTotal.CreateResponse())
 }
 
 func EditSession(c echo.Context) error {
@@ -96,7 +137,7 @@ func EditSession(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSession models.WorkoutSession
-	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Preload("ExerciseSessions.ExerciseWeights").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -115,6 +156,17 @@ func EditSession(c echo.Context) error {
 			oldExercise.Skiped = newExercise.Skiped
 			oldExercise.Active = newExercise.Active
 			oldExercise.SetsDone = newExercise.SetsDone
+			sort.Slice(newExercise.ExerciseWeights, func(i, j int) bool {
+				return oldExercise.ExerciseWeights[i].Set < oldExercise.ExerciseWeights[j].Set
+			})
+
+			sort.Slice(oldExercise.ExerciseWeights, func(i, j int) bool {
+				return oldExercise.ExerciseWeights[i].Set < oldExercise.ExerciseWeights[j].Set
+			})
+
+			for i := range newExercise.ExerciseWeights {
+				oldExercise.ExerciseWeights[i].Weight = newExercise.ExerciseWeights[i].Weight
+			}
 		}
 	}
 
@@ -123,6 +175,12 @@ func EditSession(c echo.Context) error {
 			return err
 		}
 		for i := range workoutSession.ExerciseSessions {
+			for j := range workoutSession.ExerciseSessions[i].ExerciseWeights {
+				if err := tx.Save(&workoutSession.ExerciseSessions[i].ExerciseWeights[j]).Error; err != nil {
+					return err // transaction will be rolled back
+				}
+			}
+
 			if err := tx.Save(&workoutSession.ExerciseSessions[i]).Error; err != nil {
 				return err // transaction will be rolled back
 			}
@@ -144,7 +202,7 @@ func GetAllSessions(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSessions []models.WorkoutSession
-	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("active = ? AND user_id = ?", false, claims.ID).Find(&workoutSessions).Error; err != nil {
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Preload("ExerciseSessions.ExerciseWeights").Where("active = ? AND user_id = ?", false, claims.ID).Find(&workoutSessions).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -163,7 +221,7 @@ func GetCurrentSession(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSession models.WorkoutSession
-	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Where("active = ? AND user_id = ?", true, claims.ID).First(&workoutSession).Error; err != nil {
+	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Preload("ExerciseSessions.ExerciseWeights").Where("active = ? AND user_id = ?", true, claims.ID).First(&workoutSession).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
@@ -183,12 +241,18 @@ func DeleteSession(c echo.Context) error {
 	db := c.Get("db").(*gorm.DB)
 
 	var workoutSession models.WorkoutSession
-	if err := db.Preload("ExerciseSessions").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+	if err := db.Preload("ExerciseSessions").Preload("ExerciseSessions.ExerciseWeights").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	err = db.Transaction(func(tx *gorm.DB) error {
+
 		for i := range workoutSession.ExerciseSessions {
+			for j := range workoutSession.ExerciseSessions[i].ExerciseWeights {
+				if err := tx.Delete(&workoutSession.ExerciseSessions[i].ExerciseWeights[j]).Error; err != nil {
+					return err // transaction will be rolled back
+				}
+			}
 			if err := tx.Delete(&workoutSession.ExerciseSessions[i]).Error; err != nil {
 				return err // transaction will be rolled back
 			}

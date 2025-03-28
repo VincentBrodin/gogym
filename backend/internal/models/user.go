@@ -23,6 +23,7 @@ type User struct {
 	Exercises        []Exercise        `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	WorkoutSessions  []WorkoutSession  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	ExerciseSessions []ExerciseSession `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	ExerciseWeights  []ExerciseWeight  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
