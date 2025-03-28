@@ -24,22 +24,60 @@
 			</h1>
 
 			<transition name="slide-fade" mode="out-in">
-				<h2 class="text-center text-2xl font-semibold" :key="currentExercise.exercise.name">
+				<h2 class="text-center text-2xl font-semibold mb-4" :key="currentExercise.exercise.name">
 					{{ currentExercise.exercise.name }}
 				</h2>
 			</transition>
 
-			<p class="text-center text-xl mb-4 opacity-60">
-				{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }} x
-				{{currentExercise.exercise.reps}}
-			</p>
-			<p class="text-center text-xl mb-12 opacity-60">
-				{{ currentExercise.exercise.rir }} RIR
-			</p>
+			<transition name="slide-fade" mode="out-in">
+				<p class="text-center text-xl mb-2 opacity-60" :key="currentExercise.sets_done">
+					{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }} x
+					{{currentExercise.exercise.reps}}
+				</p>
+			</transition>
 
-			<p class="text-center text-5xl font-extrabold">
+			<transition name="slide-fade" mode="out-in">
+				<p class="text-center text-xl mb-12 opacity-60" :key="currentExercise.exercise.rir">
+					{{ currentExercise.exercise.rir }} RIR
+				</p>
+			</transition>
+
+			<p class="text-center text-5xl font-extrabold mb-4">
 				{{ currentTime }}
 			</p>
+			<p class="text-center text-4xl text font-extrabold mb-4">
+				{{ timeoutTime }}
+			</p>
+			<div class="w-full mb-12 join flex flex-row justify-center">
+				<button class="btn join-item grow" @click="updateTimeout(30)">
+					+ 30 sec
+				</button>
+				<button class="btn join-item grow" @click="updateTimeout(60)">
+					+ 1 min
+				</button>
+				<button class="btn join-item grow" @click="updateTimeout(120)">
+					+ 2 min
+				</button>
+				<button class="btn join-item grow" @click="updateTimeout(180)">
+					+ 3 min
+				</button>
+			</div>
+
+			<p class="text-center text-3xl font-extrabold mb-4">
+				{{ currentExercise.exercise_weights[currentExercise.sets_done - 1].weight }} KG
+			</p>
+			<div class="w-full flex flex-row  justify-center mb-4 join">
+				<button v-for="weight in weights" :key="`primary-${weight}`" class="btn btn-success join-item grow"
+					@click="updateWeight(weight)">
+					+{{ weight }}
+				</button>
+			</div>
+			<div class="w-full flex flex-row mb-4 justify-center join">
+				<button v-for="weight in weights" :key="`error-${weight}`" class="btn btn-error join-item grow"
+					@click="updateWeight(-weight)">
+					-{{ weight }}
+				</button>
+			</div>
 		</div>
 
 
@@ -56,12 +94,36 @@
 	const router = useRouter();
 
 	const currentTime = ref("00:00:00");
+	const timeoutTime = ref("00:00:00");
+	const timeout = ref(Date.now());
+	const weights = ref([2.5, 5, 10, 15, 20, 25]);
+
 	let timer;
 
 	const session = ref(null);
 	const done = ref(false);
 	const hasSession = useLocalStorage('session', false)
 	const currentExercise = ref(null);
+
+	async function updateTimeout(time) {
+		const done = (timeout.value - Date.now()) <= 0
+		if (done) {
+			timeout.value = Date.now() + time * 1000;
+		}
+		else {
+			timeout.value += time * 1000;
+		}
+
+		timeoutTime.value = updateTime(timeout.value - Date.now());
+	}
+
+	async function updateWeight(weight) {
+		currentExercise.value.exercise_weights[currentExercise.value.sets_done - 1].weight += weight
+		if (currentExercise.value.exercise_weights[currentExercise.value.sets_done - 1].weight < 0) {
+			currentExercise.value.exercise_weights[currentExercise.value.sets_done - 1].weight = 0
+		}
+		await update(false);
+	}
 
 	function home() {
 		router.push({name: "home"});
@@ -85,7 +147,7 @@
 				clearInterval(timer);
 				currentTime.value = "Grabbing time"
 				await update(true);
-				updateTime(Date.parse(session.value.endend_at) - Date.parse(session.value.started_at));
+				currentTime.value = updateTime(Date.parse(session.value.endend_at) - Date.parse(session.value.started_at));
 				return;
 			} else {
 				currentExercise.value = nextExercise;
@@ -93,6 +155,10 @@
 				currentExercise.value.sets_done = 1;
 				currentExercise.value.skiped = false;
 			}
+		}
+		else if (currentExercise.value.sets_done != 1) {
+			const lastWeight = currentExercise.value.exercise_weights[currentExercise.value.sets_done - 2].weight;
+			currentExercise.value.exercise_weights[currentExercise.value.sets_done - 1].weight = lastWeight;
 		}
 		await update(false);
 	}
@@ -126,11 +192,18 @@
 				throw new Error((await response.json()).error);
 			}
 			session.value = await response.json();
-			updateTime(Date.now() - Date.parse(session.value.started_at));
+			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
 			// Grab the active exercise
 			currentExercise.value = session.value.exercise_sessions.find(
 				(exercise) => exercise.active
 			);
+
+			for (let exercise_session of session.value.exercise_sessions) {
+				exercise_session.exercise_weights.sort((a, b) => a.order - b.order);
+				for (let exercise_weight of exercise_session.exercise_weights) {
+					exercise_weight.init_weight = exercise_weight.weight;
+				}
+			}
 			// If no active, grab the next
 			if (currentExercise.value == null) {
 				currentExercise.value = grabNext(session.value.exercise_sessions);
@@ -180,11 +253,11 @@
 	}
 
 	function updateTime(time) {
-		const totalSeconds = Math.floor(time / 1000);
+		const totalSeconds = Math.max(Math.floor(time / 1000), 0);
 		const hours = Math.floor(totalSeconds / 3600);
 		const minutes = Math.floor((totalSeconds % 3600) / 60);
 		const seconds = totalSeconds % 60;
-		currentTime.value = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+		return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
 			2,
 			"0"
 		)}:${String(seconds).padStart(2, "0")}`;
@@ -193,8 +266,9 @@
 	onMounted(async () => {
 		await grabSession();
 		timer = setInterval(() => {
-			updateTime(Date.now() - Date.parse(session.value.started_at));
-		}, 750);
+			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
+			timeoutTime.value = updateTime(timeout.value - Date.now());
+		}, 500);
 	});
 
 	onUnmounted(() => {
