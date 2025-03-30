@@ -19,7 +19,7 @@ type Workout struct {
 	LastDone  time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt time.Time
+	DeletedAt time.Time 
 	Deleted   bool `gorm:"default:false"`
 }
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,12 +40,13 @@ func spawnServer(config Config) *echo.Echo {
 	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOriginFunc: func(origin string) (bool, error) {
-			u, err := url.Parse(origin)
-			if err != nil {
-				return false, err
-			}
-			host := u.Hostname()
-			return host == "localhost" || host == "127.0.0.1", nil
+			// u, err := url.Parse(origin)
+			// if err != nil {
+			// 	return false, err
+			// }
+			// host := u.Hostname()
+			// return host == "localhost" || host == "127.0.0.1", nil
+			return true, nil
 		}, AllowHeaders: []string{"*"},
 		AllowMethods:     []string{"GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"},
 		AllowCredentials: true,

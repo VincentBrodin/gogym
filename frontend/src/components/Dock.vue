@@ -14,6 +14,13 @@
 			</button>
 		</router-link>
 
+		<router-link to="/food" :class="{ 'dock-active': (page == 'food') }">
+			<button class="flex flex-col justify-between items-center">
+				<i class="bi bi-egg text-xl"></i>
+				<span class="dock-label">Food</span>
+			</button>
+		</router-link>
+
 		<router-link to="/stats" :class="{ 'dock-active': (page == 'stats') }">
 			<button class="flex flex-col justify-between items-center ">
 				<i class="bi bi-clipboard-data text-xl"></i>
@@ -28,7 +35,6 @@
 				<span class="dock-label">Settings</span>
 			</button>
 		</router-link>
-
 	</div>
 </template>
 
