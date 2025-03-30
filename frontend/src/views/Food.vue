@@ -1,5 +1,5 @@
 <template>
-	<!--<StreamBarcodeReader @decode="onDecode" @loaded="onLoaded"></StreamBarcodeReader>-->
+	<StreamBarcodeReader @decode="onDecode"></StreamBarcodeReader>
 
 	<div class="w-full h-full p-8">
 		<div class="w-full flex flex-row justify-center items-center">
@@ -26,12 +26,18 @@
 </template>
 
 <script setup>
+	import {StreamBarcodeReader} from 'vue-barcode-reader';
 	import {ref, onMounted} from 'vue'
 
 	const progress = ref(0);
 	const back = ref(false);
 	const kcals = ref(0);
 	const weight = ref(0);
+
+	function onDecode(value) {
+		alert(value)
+	}
+
 
 	onMounted(() => {
 		setInterval(() => {
