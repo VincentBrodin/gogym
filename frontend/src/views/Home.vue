@@ -3,7 +3,7 @@
 		<p>Loading...</p>
 	</div>
 	<div v-else class="w-full h-full p-8">
-		<div class="mb-8">
+		<div class="mb-4">
 			<h1 class="text-left text-2xl font-bold">Hello {{name}}! </h1>
 			<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
 		</div>

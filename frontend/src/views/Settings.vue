@@ -1,21 +1,8 @@
 <template>
 	<div class="w-full h-full p-8 flex flex-col gap-4">
-		<!--<div class="dropdown w-full mb-4">
-			<div tabindex="0" role="button" class="btn m-1 w-full">
-				Theme
-				<svg width="12px" height="12px" class="inline-block h-2 w-2 fill-current opacity-60"
-					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-					<path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
-				</svg>
-			</div>
-			<ul tabindex="0" class="dropdown-content bg-base-300 rounded-box z-1 p-2 shadow-2xl w-full">
-				<li v-for="theme in themes" :key="theme" class="my-2">
-					<input type="radio" name="theme-dropdown"
-						class="theme-controller btn btn-block justify-start" :aria-label="theme"
-						:value="theme" />
-				</li>
-			</ul>
-		</div>-->
+		<div class="mb-4">
+			<h1 class="text-left text-2xl font-bold">Settings</h1>
+		</div>
 		<fieldset class="fieldset">
 			<legend class="fieldset-legend">Username</legend>
 			<input v-model="username" type="text" class="input w-full" placeholder="Name" />

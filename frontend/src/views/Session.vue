@@ -1,5 +1,8 @@
 <template>
-	<div v-if="session == null" class="flex w-full h-full items-center justify-center">
+	<div v-if="loading" class="w-full h-full flex justify-center items-center">
+		<p>Loading...</p>
+	</div>
+	<div v-else-if="session == null" class="flex w-full h-full items-center justify-center">
 		<p class="text-error text-xl font-bold">Error: Session not found</p>
 	</div>
 	<div v-else-if="done" class="flex w-full h-full items-center justify-center flex-col p-8">
@@ -100,6 +103,8 @@
 
 	let timer;
 
+
+	const loading = ref(true);
 	const session = ref(null);
 	const done = ref(false);
 	const hasSession = useLocalStorage('session', false)
@@ -209,8 +214,10 @@
 				currentExercise.value = grabNext(session.value.exercise_sessions);
 				currentExercise.value.sets_done = 1;
 				currentExercise.value.active = true;
+
 				await update(false);
 			}
+			loading.value = false;
 		} catch (error) {
 			console.log(error);
 		}

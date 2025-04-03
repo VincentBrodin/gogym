@@ -2,12 +2,14 @@
 	<div v-if="loading" class="w-full h-full flex justify-center items-center">
 		<p>Loading...</p>
 	</div>
-	<div v-else class="w-full h-full p-8">
+	<div v-else class="w-full min-h-full p-8">
+		<div class="mb-4">
+			<h1 class="text-left text-2xl font-bold">Stats</h1>
+		</div>
 		<transition-group name="session" tag="div" class="w-full">
 			<StatItem v-for="session in sessions" :key="session.id" :session="session" @remove="removeSession" />
 		</transition-group>
 	</div>
-
 </template>
 
 <script setup>
