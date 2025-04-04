@@ -12,3 +12,6 @@ dev:
 	@if not exist tmp mkdir tmp
 	@copy .env .\tmp\.env
 	air
+
+setup:
+	go mod tidy

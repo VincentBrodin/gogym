@@ -28,3 +28,7 @@ up-docker:
 dev:
 	$(MAKE) -C frontend dev 
 	$(MAKE) -C backend dev 
+
+setup:
+	$(MAKE) -C backend setup 
+	$(MAKE) -C frontend setup 
