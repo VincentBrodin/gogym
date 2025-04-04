@@ -23,7 +23,7 @@
 		</div>
 		<div class="flex flex-row gap-4 w-full my-8">
 			<button class="btn" @click="promptClear">Clear</button>
-			<button class="grow btn btn-primary" @click="add">Add: {{(kcals/Math.max(perWeight, 1))*weight}}kcals</button>
+			<button class="grow btn btn-primary" @click="add">Add: {{Math.round((kcals/Math.max(perWeight, 1))*weight)}}kcals</button>
 		</div>
 		<p class="text-xl">Total: {{totalKcals}}kcals</p>
 	</div>
@@ -51,7 +51,7 @@
 	//}
 
 	function add() {
-		totalKcals.value = (kcals.value / perWeight.value) * weight.value;
+		totalKcals.value += Math.round((kcals.value / perWeight.value) * weight.value);
 		kcals.value = 0;
 		weight.value = 0;
 		perWeight.value = 100;
