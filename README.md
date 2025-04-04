@@ -31,27 +31,27 @@ Ensure you have the following installed:
 
 1. **Clone the Repository**
 
-   \`\`\`bash
+   ```bash
    git clone https://github.com/yourusername/gogym.git
    cd gogym
-   \`\`\`
+   ```
 
 2. **Set Up the Application**
 
-   \`\`\`bash
+   ```bash
    make setup
-   \`\`\`
+   ```
 
 3. **Start the Development Server**
 
-   \`\`\`bash
+   ```bash
    make dev
-   \`\`\`
+   ```
 
    Access the app at the given url from bun/vite.
 
 4. **Build for Production**
 
-   \`\`\`bash
+   ```bash
    make build
-   \`\`\`
+   ```
