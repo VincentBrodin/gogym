@@ -1,7 +1,7 @@
 <template>
 	<router-view />
 	<Dock />
-	<div class="h-8 w-full bg-red-500">
+	<div class="h-8 w-full opacity-0 pointer-events-none">
 	</div>
 </template>
 
