@@ -169,9 +169,20 @@
 	}
 
 	async function skip() {
+		console.log(session.value.exercise_sessions)
 		currentExercise.value.sets_done = 0;
 		currentExercise.value.active = false;
 		currentExercise.value.skiped = true;
+
+		const old = currentExercise.value;
+		currentExercise.value = grabNext(session.value.exercise_sessions);
+		if (currentExercise.value == null || currentExercise.value == old) {
+			console.log("All null")
+			for (let exercise of session.value.exercise_sessions) {
+				exercise.skiped = false;
+			}
+			old.skiped = true;
+		}
 
 		currentExercise.value = grabNext(session.value.exercise_sessions);
 
@@ -228,6 +239,9 @@
 		let result = list.filter((exercise) => !exercise.skiped && !exercise.completed);
 		if (result.length === 0) {
 			result = list.filter((exercise) => !exercise.completed);
+		}
+		if (result.length == 0) {
+			return null;
 		}
 		return result.at(0);
 	}
