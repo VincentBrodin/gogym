@@ -3,6 +3,14 @@
 		<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 border" @click="emitStart">
 			<div>
 				<h1 class="text-xl text-left font-semibold">{{ session.workout.name }}</h1>
+				<p v-if="session.gain > 0" class="text-xs text-left text-success">
+					<i class="bi bi-arrow-up"></i>
+					{{ Math.round(session.gain) }}%
+				</p>
+				<p v-else-if="session.gain < 0" class="text-xs text-left text-error">
+					<i class="bi bi-arrow-down"></i>
+					{{ Math.round(session.gain) }}%
+				</p>
 				<p class="text-xs text-left opacity-60">{{ session.workout.note }}</p>
 				<p class="text-xs text-left opacity-60 mb-4">{{timeAgo}}</p>
 				<p class="text-xs text-left opacity-60">{{duration}}</p>
