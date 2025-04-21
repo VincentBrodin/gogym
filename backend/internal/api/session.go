@@ -200,14 +200,17 @@ func GetAllSessions(c echo.Context) error {
 	claims := userToken.Claims.(*models.JwtUserClaims)
 
 	db := c.Get("db").(*gorm.DB)
-
 	var workoutSessions []models.WorkoutSession
-	if err := db.Preload("Workout", "deleted = ?", false).Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise", "deleted = ?", false).Preload("ExerciseSessions.ExerciseWeights").Where("active = ? AND user_id = ?", false, claims.ID).Find(&workoutSessions).Error; err != nil {
+	if err := db.Preload("Workout").Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise").Preload("ExerciseSessions.ExerciseWeights").Where("active = ? AND user_id = ?", false, claims.ID).Find(&workoutSessions).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	response := make([]models.WorkoutSessionResponse, len(workoutSessions))
 	for i, session := range workoutSessions {
+		if(session.Workout == nil) {
+			fmt.Printf("Session has no workout %d\n", session.ID)
+			continue
+		}
 		response[i] = session.CreateResponse()
 	}
 
