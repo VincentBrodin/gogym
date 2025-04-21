@@ -24,6 +24,9 @@
 		<div class="p-8">
 			<h1 class="text-center text-3xl font-bold mb-4">
 				{{ session.workout.name }}
+				<div class="px-16">
+					<progress class="progress w-full" :value="progress" max="100"></progress>
+				</div>
 			</h1>
 
 			<transition name="slide-fade" mode="out-in">
@@ -107,6 +110,7 @@
 	const loading = ref(true);
 	const session = ref(null);
 	const done = ref(false);
+	const progress = ref(0);
 	const hasSession = useLocalStorage('session', false)
 	const currentExercise = ref(null);
 
@@ -141,6 +145,9 @@
 			currentExercise.value.completed = true;
 			currentExercise.value.active = false;
 			currentExercise.value.skiped = false;
+			//how many has been done 
+			const completed = session.value.exercise_sessions.filter(ex => ex.completed).length;
+			progress.value = Math.round((completed / session.value.exercise_sessions.length) * 100)
 
 			const nextExercise = grabNext(session.value.exercise_sessions);
 
@@ -189,6 +196,7 @@
 		currentExercise.value.active = true;
 		currentExercise.value.skiped = false;
 		currentExercise.value.sets_done = 1;
+
 		await update();
 	}
 
@@ -208,6 +216,7 @@
 				throw new Error((await response.json()).error);
 			}
 			session.value = await response.json();
+			console.log(session.value)
 			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
 			// Grab the active exercise
 			currentExercise.value = session.value.exercise_sessions.find(
