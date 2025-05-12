@@ -1,0 +1,53 @@
+commands:
+  dev_front:
+    variants:
+      - platform: linux
+        run: bun run dev --host 0.0.0.0
+    where: frontend
+  dev_back:
+    run: air
+    where: backend
+
+  build:
+    run:
+      - godo build_front
+      - godo build_back
+
+  build_front:
+    variants:
+      - platform: linux
+        run: bun run build
+    where: frontend
+
+  build_back:
+    run: 
+      - $mkdir ../bin
+      - $rm -f ../bin/*
+      - cp .env ../bin/.env
+      - go build -o ../bin/app main.go
+    where: backend
+
+  dock:
+    run: 
+      - godo build
+      - sudo docker build -f Dockerfile -t vincentbrodin/gogym:latest .
+
+  push:
+    run:
+      - godo dock
+      - sudo docker push vincentbrodin/gogym:latest
+
+  init:
+    run:
+      - godo init_back
+      - godo init_front
+
+  init_back:
+    run: go mod tidy
+    where: backend
+
+  init_front:
+    run: bun install
+    where: frontend
+
+

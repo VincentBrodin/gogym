@@ -1,0 +1,164 @@
+info: ghostty version=1.1.3-arch1
+info: ghostty build optimize=ReleaseFast
+info: runtime=apprt.Runtime.gtk
+info: font_backend=font.main.Backend.fontconfig_freetype
+info: dependency harfbuzz=11.2.0
+info: dependency fontconfig=21602
+info: renderer=renderer.OpenGL
+info: libxev backend=main.Backend.epoll
+info(os): setlocale from env result=en_US.UTF-8
+info(gtk): GTK version build=4.18.2 runtime=4.18.5
+info: reading configuration file path=/home/vince/.config/ghostty/config
+info(config): default shell source=env value=/usr/bin/zsh
+warning(gtk): setting GDK_DEBUG=gl-no-fractional
+warning(gtk): setting GDK_DISABLE=gles-api,vulkan
+Unrecognized value "gl-no-fractional". Try GDK_DEBUG=help
+info(gtk): libadwaita version build=1.7.0 runtime=1.7.2
+info(grid): loaded OpenGL 4.6
+info(font_shared_grid_set): font regular: RobotoMono Nerd Font Mono Md
+info(font_shared_grid_set): font bold: RobotoMono Nerd Font Mono Bd
+info(font_shared_grid_set): font italic: RobotoMono Nerd Font Mono It
+info(font_shared_grid_set): font bold_italic: RobotoMono Nerd Font Mono Bd It
+info(io_exec): found Ghostty resources dir: /usr/share/ghostty
+warning(io_exec): shell could not be detected, no automatic shell integration will be injected
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): started subcommand path=/bin/sh pid=22932
+info(io_exec): subcommand cgroup=-
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(grid): reallocating GPU buffer old=0 new=38
+info(grid): reallocating GPU buffer old=38 new=165
+info: ghostty version=1.1.3-arch1
+info: ghostty build optimize=ReleaseFast
+info: runtime=apprt.Runtime.gtk
+info: font_backend=font.main.Backend.fontconfig_freetype
+info: dependency harfbuzz=11.2.0
+info: dependency fontconfig=21602
+info: renderer=renderer.OpenGL
+info: libxev backend=main.Backend.epoll
+info(os): setlocale from env result=en_US.UTF-8
+info(gtk): GTK version build=4.18.2 runtime=4.18.5
+info: reading configuration file path=/home/vince/.config/ghostty/config
+info(config): default shell source=env value=/usr/bin/zsh
+warning(gtk): setting GDK_DEBUG=gl-no-fractional
+warning(gtk): setting GDK_DISABLE=gles-api,vulkan
+Unrecognized value "gl-no-fractional". Try GDK_DEBUG=help
+info(gtk): libadwaita version build=1.7.0 runtime=1.7.2
+info(grid): loaded OpenGL 4.6
+info(font_shared_grid_set): font regular: RobotoMono Nerd Font Mono Md
+info(font_shared_grid_set): font bold: RobotoMono Nerd Font Mono Bd
+info(font_shared_grid_set): font italic: RobotoMono Nerd Font Mono It
+info(font_shared_grid_set): font bold_italic: RobotoMono Nerd Font Mono Bd It
+info(io_exec): found Ghostty resources dir: /usr/share/ghostty
+warning(io_exec): shell could not be detected, no automatic shell integration will be injected
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): started subcommand path=/bin/sh pid=32717
+info(io_exec): subcommand cgroup=-
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(grid): reallocating GPU buffer old=0 new=38
+info(grid): reallocating GPU buffer old=38 new=165
+info: ghostty version=1.1.3-arch1
+info: ghostty build optimize=ReleaseFast
+info: runtime=apprt.Runtime.gtk
+info: font_backend=font.main.Backend.fontconfig_freetype
+info: dependency harfbuzz=11.2.0
+info: dependency fontconfig=21602
+info: renderer=renderer.OpenGL
+info: libxev backend=main.Backend.epoll
+info(os): setlocale from env result=en_US.UTF-8
+info(gtk): GTK version build=4.18.2 runtime=4.18.5
+info: reading configuration file path=/home/vince/.config/ghostty/config
+info(config): default shell source=env value=/usr/bin/zsh
+warning(gtk): setting GDK_DEBUG=gl-no-fractional
+warning(gtk): setting GDK_DISABLE=gles-api,vulkan
+Unrecognized value "gl-no-fractional". Try GDK_DEBUG=help
+info(gtk): libadwaita version build=1.7.0 runtime=1.7.2
+info(grid): loaded OpenGL 4.6
+info(font_shared_grid_set): font regular: RobotoMono Nerd Font Mono Md
+info(font_shared_grid_set): font bold: RobotoMono Nerd Font Mono Bd
+info(font_shared_grid_set): font italic: RobotoMono Nerd Font Mono It
+info(font_shared_grid_set): font bold_italic: RobotoMono Nerd Font Mono Bd It
+info(io_exec): found Ghostty resources dir: /usr/share/ghostty
+warning(io_exec): shell could not be detected, no automatic shell integration will be injected
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): started subcommand path=/bin/sh pid=32951
+info(io_exec): subcommand cgroup=-
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): pty fd closed, read thread exiting
+info(surface): surface closed addr=5b22629e5b50
+
+(process:32907): Gtk-CRITICAL **: 12:17:37.546: gtk_widget_unparent: assertion 'GTK_IS_WIDGET (widget)' failed
+info: ghostty version=1.1.3-arch1
+info: ghostty build optimize=ReleaseFast
+info: runtime=apprt.Runtime.gtk
+info: font_backend=font.main.Backend.fontconfig_freetype
+info: dependency harfbuzz=11.2.0
+info: dependency fontconfig=21602
+info: renderer=renderer.OpenGL
+info: libxev backend=main.Backend.epoll
+info(os): setlocale from env result=en_US.UTF-8
+info(gtk): GTK version build=4.18.2 runtime=4.18.5
+info: reading configuration file path=/home/vince/.config/ghostty/config
+info(config): default shell source=env value=/usr/bin/zsh
+warning(gtk): setting GDK_DEBUG=gl-no-fractional
+warning(gtk): setting GDK_DISABLE=gles-api,vulkan
+Unrecognized value "gl-no-fractional". Try GDK_DEBUG=help
+info(gtk): libadwaita version build=1.7.0 runtime=1.7.2
+info(grid): loaded OpenGL 4.6
+info(font_shared_grid_set): font regular: RobotoMono Nerd Font Mono Md
+info(font_shared_grid_set): font bold: RobotoMono Nerd Font Mono Bd
+info(font_shared_grid_set): font italic: RobotoMono Nerd Font Mono It
+info(font_shared_grid_set): font bold_italic: RobotoMono Nerd Font Mono Bd It
+info(io_exec): found Ghostty resources dir: /usr/share/ghostty
+warning(io_exec): shell could not be detected, no automatic shell integration will be injected
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): started subcommand path=/bin/sh pid=33198
+info(io_exec): subcommand cgroup=-
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): pty fd closed, read thread exiting
+info(surface): surface closed addr=56a87c022740
+
+(process:33156): Gtk-CRITICAL **: 12:18:37.520: gtk_widget_unparent: assertion 'GTK_IS_WIDGET (widget)' failed
+info: ghostty version=1.1.3-arch1
+info: ghostty build optimize=ReleaseFast
+info: runtime=apprt.Runtime.gtk
+info: font_backend=font.main.Backend.fontconfig_freetype
+info: dependency harfbuzz=11.2.0
+info: dependency fontconfig=21602
+info: renderer=renderer.OpenGL
+info: libxev backend=main.Backend.epoll
+info(os): setlocale from env result=en_US.UTF-8
+info(gtk): GTK version build=4.18.2 runtime=4.18.5
+info: reading configuration file path=/home/vince/.config/ghostty/config
+info(config): default shell source=env value=/usr/bin/zsh
+warning(gtk): setting GDK_DEBUG=gl-no-fractional
+warning(gtk): setting GDK_DISABLE=gles-api,vulkan
+Unrecognized value "gl-no-fractional". Try GDK_DEBUG=help
+info(gtk): libadwaita version build=1.7.0 runtime=1.7.2
+info(grid): loaded OpenGL 4.6
+info(font_shared_grid_set): font regular: RobotoMono Nerd Font Mono Md
+info(font_shared_grid_set): font bold: RobotoMono Nerd Font Mono Bd
+info(font_shared_grid_set): font italic: RobotoMono Nerd Font Mono It
+info(font_shared_grid_set): font bold_italic: RobotoMono Nerd Font Mono Bd It
+info(io_exec): found Ghostty resources dir: /usr/share/ghostty
+warning(io_exec): shell could not be detected, no automatic shell integration will be injected
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(io_exec): started subcommand path=/bin/sh pid=33333
+info(io_exec): subcommand cgroup=-
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+warning(gtk): unimplemented action=apprt.action.Action.Key.key_sequence
+warning(gtk): unimplemented action=apprt.action.Action.Key.cell_size
+info(grid): reallocating GPU buffer old=0 new=38
+info(grid): reallocating GPU buffer old=38 new=165

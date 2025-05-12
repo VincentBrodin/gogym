@@ -25,7 +25,7 @@ Ensure you have the following installed:
 - [Bun](https://bun.sh/)
 - [Go](https://golang.org/)
 - [Git](https://git-scm.com/)
-- [Make](https://www.gnu.org/software/make/)
+- [Godo](https://github.com/vincentbrodin/godo/)
 
 ### Installation
 
@@ -39,13 +39,14 @@ Ensure you have the following installed:
 2. **Set Up the Application**
 
    ```bash
-   make setup
+   godo init
    ```
 
 3. **Start the Development Server**
 
    ```bash
-   make dev
+   godo dev_back
+   godo dev_front
    ```
 
    Access the app at the given url from bun/vite.
@@ -53,5 +54,5 @@ Ensure you have the following installed:
 4. **Build for Production**
 
    ```bash
-   make build
+   godo build
    ```
