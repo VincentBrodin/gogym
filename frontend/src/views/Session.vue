@@ -24,16 +24,16 @@
 		<div class="p-8">
 			<h1 class="text-center text-3xl font-bold mb-4">
 				{{ session.workout.name }}
-				<div class="px-16">
-					<progress class="progress w-full" :value="progress" max="100"></progress>
-				</div>
 			</h1>
+			<select class="select w-full font-semibold text-xl mb-4 text-center" @change="switchExercise"
+				ref="selectRef">
+				<option v-for="item, i in session.exercise_sessions" :key="item.exercise.id" :selected="item.active"
+					:value="i">
+					{{item.exercise.name}}</option>
+			</select>
 
-			<transition name="slide-fade" mode="out-in">
-				<h2 class="text-center text-2xl font-semibold mb-4" :key="currentExercise.exercise.name">
-					{{ currentExercise.exercise.name }}
-				</h2>
-			</transition>
+
+
 
 			<transition name="slide-fade" mode="out-in">
 				<p class="text-center text-xl mb-2 opacity-60" :key="currentExercise.sets_done">
@@ -47,6 +47,10 @@
 					{{ currentExercise.exercise.rir }} RIR
 				</p>
 			</transition>
+
+			<div class="px-16 mb-4">
+				<progress class="progress w-full" :value="progress" max="100"></progress>
+			</div>
 
 			<p class="text-center text-5xl font-extrabold mb-4">
 				{{ currentTime }}
@@ -101,7 +105,7 @@
 
 	const currentTime = ref("00:00:00");
 	const timeoutTime = ref("00:00:00");
-	const timeout = ref(Date.now());
+	const timeout = useLocalStorage("timeout", Date.now());
 	const weights = ref([2.5, 5, 10, 15, 20, 25]);
 
 	let timer;
@@ -111,6 +115,7 @@
 	const session = ref(null);
 	const done = ref(false);
 	const progress = ref(0);
+	const selectRef = ref(null)
 	const hasSession = useLocalStorage('session', false)
 	const currentExercise = ref(null);
 
@@ -138,6 +143,24 @@
 		router.push({name: "home"});
 	}
 
+	async function switchExercise() {
+		currentExercise.value.active = false;
+		currentExercise.value.skiped = true;
+		currentExercise.value.sets_done = 1
+		const i = Number(selectRef.value.value)
+
+		console.log(currentExercise.value.exercise.name)
+		currentExercise.value = session.value.exercise_sessions[i]
+		console.log(currentExercise.value.exercise.name)
+
+		currentExercise.value.active = true
+		currentExercise.value.skiped = false
+		currentExercise.value.completed = false
+		currentExercise.value.sets_done = 1
+		updateProgress();
+		await update(false);
+	}
+
 	async function next() {
 		currentExercise.value.sets_done++;
 		if (currentExercise.value.sets_done > currentExercise.value.exercise.sets) {
@@ -145,9 +168,7 @@
 			currentExercise.value.completed = true;
 			currentExercise.value.active = false;
 			currentExercise.value.skiped = false;
-			//how many has been done 
-			const completed = session.value.exercise_sessions.filter(ex => ex.completed).length;
-			progress.value = Math.round((completed / session.value.exercise_sessions.length) * 100)
+			updateProgress();
 
 			const nextExercise = grabNext(session.value.exercise_sessions);
 
@@ -172,7 +193,7 @@
 			const lastWeight = currentExercise.value.exercise_weights[currentExercise.value.sets_done - 2].weight;
 			currentExercise.value.exercise_weights[currentExercise.value.sets_done - 1].weight = lastWeight;
 		}
-		await update(false);
+		await update();
 	}
 
 	async function skip() {
@@ -216,6 +237,9 @@
 				throw new Error((await response.json()).error);
 			}
 			session.value = await response.json();
+			session.value.exercise_sessions.sort(function (a, b) {
+				return a.exercise.order - b.exercise.order;
+			});
 			console.log(session.value)
 			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
 			// Grab the active exercise
@@ -237,10 +261,17 @@
 
 				await update(false);
 			}
+			updateProgress();
 			loading.value = false;
 		} catch (error) {
 			console.log(error);
 		}
+	}
+
+	function updateProgress() {
+		const completed = session.value.exercise_sessions.filter(ex => ex.completed).length;
+		progress.value = Math.round((completed / session.value.exercise_sessions.length) * 100)
+
 	}
 
 	function grabNext(list) {
@@ -295,6 +326,8 @@
 
 	onMounted(async () => {
 		await grabSession();
+		currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
+		timeoutTime.value = updateTime(timeout.value - Date.now());
 		timer = setInterval(() => {
 			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
 			timeoutTime.value = updateTime(timeout.value - Date.now());
