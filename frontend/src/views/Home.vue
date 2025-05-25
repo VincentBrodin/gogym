@@ -7,7 +7,41 @@
 			<h1 class="text-left text-2xl font-bold">Hello {{name}}! </h1>
 			<p class="text-left text-sm opacity-60">Are you ready to workout?</p>
 		</div>
-		<transition-group name="workout" tag="div" class="w-full">
+		<div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-16">
+			<div class="flex flex-row p-4 bg-blue-50 rounded-2xl border border-blue-200 gap-2 shadow-md">
+				<div
+					class="bg-blue-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-bullseye text-blue-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Total Workouts</p>
+					<p class="text-2xl font-bold">{{workouts.length}}</p>
+				</div>
+			</div>
+			<div class="flex flex-row p-4 bg-green-50 rounded-2xl border border-green-200 gap-2 shadow-md">
+				<div
+					class="bg-green-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-graph-up-arrow text-green-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Completed</p>
+					<p class="text-2xl font-bold">{{workouts.length}}</p>
+				</div>
+			</div>
+			<div class="flex flex-row p-4 bg-purple-50 rounded-2xl border border-purple-200 gap-2 shadow-md">
+				<div
+					class="bg-purple-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-clock text-purple-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Total Time</p>
+					<p class="text-2xl font-bold">{{workouts.length}}h</p>
+				</div>
+			</div>
+		</div>
+		<h2 class="font-bold text-2xl mb-4">Your workouts</h2>
+		<transition-group name="workout" tag="div"
+			class="w-full grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 place-items-center gap-4 pb-40">
 			<WorkoutItem v-for="workout in workouts" :key="workout.id" :workout="workout" @click="startSession"
 				@edit="editWorkout" @remove="removeWorkout" />
 		</transition-group>
