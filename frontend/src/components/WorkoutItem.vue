@@ -36,7 +36,9 @@
 						class="bg-purple-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
 						<i class="bi bi-clock text-purple-500 text-sm"></i>
 					</div>
-					<p class="text-sm opacity-60">60 min</p>
+					<p v-if="workout.time == null" class="text-sm opacity-60">Loading</p>
+					<p v-else-if="workout.time == -1"class="text-sm opacity-60">No data avalible</p>
+					<p v-else class="text-sm opacity-60">{{workout.time.toFixed(0)}} min</p>
 				</div>
 			</div>
 			<p class="opacity-60">Last done:</p>

@@ -1,27 +1,43 @@
 <template>
-	<div class="w-full">
-		<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 border" @click="emitStart">
-			<div>
-				<h1 class="text-xl text-left font-semibold">{{ session.workout.name }}</h1>
-				<p v-if="session.gain > 0" class="text-xs text-left text-success">
-					<i class="bi bi-arrow-up"></i>
-					{{ Math.round(session.gain) }}%
-				</p>
-				<p v-else-if="session.gain < 0" class="text-xs text-left text-error">
-					<i class="bi bi-arrow-down"></i>
-					{{ Math.round(session.gain) }}%
-				</p>
-				<p class="text-xs text-left opacity-60">{{ session.workout.note }}</p>
-				<p class="text-xs text-left opacity-60 mb-4">{{timeAgo}}</p>
-				<p class="text-xs text-left opacity-60">{{duration}}</p>
-
+	<div class="card card-border bg-base-100 w-96 shadow-xl">
+		<div class="card-body">
+			<div class="flex flex-row justify-between">
+				<div class="flex flex-col">
+					<p class="text-xl text-left font-bold">{{ session.workout.name }}</p>
+					<p class="opacity-60">
+						<i class="bi bi-calendar"></i>
+						{{ niceDate }}
+					</p>
+				</div>
+				<div class="flex flex-col">
+					<p class="text-xl font-bold text-blue-400 text-end">{{ time.toFixed(0) }}</p>
+					<p class="opacity-60 text-end text-sm">min</p>
+				</div>
 			</div>
-			<div class="flex flex-row items-center justify-end gap-4">
-				<button class="btn btn-square btn-error" @click.stop="promptRemove">
-					<i class="bi bi-trash text-xl"></i>
+
+			<div class="flex flex-row justify-evenly mt-4">
+				<div class="flex flex-col justify-center items-center">
+					<p class="text-center text-xl font-bold">{{session.exercise_sessions.length}}</p>
+					<p class="text-center opacity-60 text-sm">Exercises</p>
+				</div>
+
+				<div class="flex flex-col justify-center items-center">
+					<p class="text-center text-xl font-bold">{{totalSets}}</p>
+					<p class="text-center opacity-60 text-sm">Sets</p>
+				</div>
+
+				<div class="flex flex-col justify-center items-center">
+					<p class="text-center text-xl font-bold">{{totalReps}}</p>
+					<p class="text-center opacity-60 text-sm">Reps</p>
+				</div>
+			</div>
+			<div class="card-actions flex justify-end">
+				<button class="btn btn-circle btn-ghost" @click.stop="promptRemove">
+					<i class="bi bi-trash text-lg text-error"></i>
 				</button>
 			</div>
-		</button>
+
+		</div>
 		<ConfirmationModal ref="confirmModal" promptText="Are you sure?"
 			:detailText="`Are you sure that you want to delete this session?`" confirmText="Yes"
 			@confirmed="emitRemove" />
@@ -70,4 +86,20 @@
 		updateInterval: 60000, // One min 
 		fullDateFormatter: date => date.toLocaleDateString()
 	});
+
+	const time = (new Date(props.session.endend_at) - new Date(props.session.started_at)) / 1000 / 60
+	const niceDate = new Date(props.session.endend_at).toLocaleDateString('en-US', {
+		weekday: 'long', // "Saturday"
+		month: 'short',  // "Jan"
+		day: 'numeric',  // "20"
+	});
+
+	const totalSets = props.session.exercise_sessions.reduce((sum, exerciseSession) => {
+		return sum + (exerciseSession.sets_done || 0);
+	}, 0);
+	const totalReps = props.session.exercise_sessions.reduce((sum, exSession) => {
+		const sets = exSession.sets_done || 0;
+		const reps = exSession.exercise.reps || 0;
+		return sum + sets * reps;
+	}, 0);
 </script>

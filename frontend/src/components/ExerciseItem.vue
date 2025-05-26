@@ -1,54 +1,91 @@
 <template>
-	<div class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 gap-8 border">
-		<div class="grow">
-			<!--INFO-->
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend text-left">Name</legend>
-				<input v-model="exercise.name" type="text" class="input w-full" placeholder="Name" />
-			</fieldset>
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend text-left">Note</legend>
-				<input v-model="exercise.note" type="text" class="input w-full" placeholder="Note" />
-				<p class="fieldset-label">Not required</p>
-			</fieldset>
+	<div class="card card-border bg-base-100 shadow-xl w-full">
+		<div class="card-body flex flex-row justify-between gap-8">
+			<div class="grow flex flex-col gap-4">
+				<!--INFO-->
 
+				<input v-model="exercise.name" type="text" class="input input-ghost px-0 text-xl w-full mb"
+					placeholder="Exercise Name" />
 
-			<!--SETS-->
-			<fieldset class="fieldset w-full">
-				<legend class="fieldset-legend text-left">Sets: {{exercise.sets}}</legend>
-				<input v-model.number="exercise.sets" type="range" min="1" max="8" class="range" step="1" />
-			</fieldset>
+				<input v-model="exercise.note" type="text" class="input input-ghost w-full px-0 opacity-60"
+					placeholder="Exercise Note" />
 
-			<!--REPS-->
-			<fieldset class="fieldset w-full">
-				<legend class="fieldset-legend text-left">Reps: {{exercise.reps}}</legend>
-				<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range" step="1" />
-			</fieldset>
+				<!--SETS-->
+				<fieldset class="fieldset w-full">
+					<div class="flex flex-row items-center justify-between w-full">
+						<div class="flex flex-row items-center">
+							<div
+								class="bg-blue-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
+								<i class="bi bi-hash text-blue-500 text-sm"></i>
+							</div>
+							<legend class="fieldset-legend text-left">Sets: </legend>
+						</div>
+						<p class="font-bold text-blue-500 text-xl text-end">{{exercise.sets}}</p>
+					</div>
 
-			<!--RIR-->
-			<fieldset class="fieldset w-full">
-				<legend class="fieldset-legend text-left">RIR: {{exercise.rir}}</legend>
-				<input v-model.number="exercise.rir" type="range" min="0" max="4" class="range" step="1" />
-			</fieldset>
+					<input v-model.number="exercise.sets" type="range" min="1" max="8" class="range w-full" step="1" />
+					<div class="w-full flex flex-row justify-between">
+						<p class="text-start opacity-60">1</p>
+						<p class="text-end opacity-60">8</p>
+					</div>
+				</fieldset>
 
-		</div>
-		<div class="flex flex-col justify-between">
-			<div class="flex flex-col gap-8">
-				<!--UP-->
-				<button v-if="exercise.order != 0" class="btn btn-square" @click.stop="moveUp">
-					<i class="bi bi-arrow-up text-xl"></i>
-				</button>
+				<!--REPS-->
+				<fieldset class="fieldset w-full">
+					<div class="flex flex-row items-center justify-between w-full">
+						<div class="flex flex-row items-center">
+							<div
+								class="bg-green-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
+								<i class="bi bi-arrow-repeat text-green-500 text-sm"></i>
+							</div>
+							<legend class="fieldset-legend text-left">Reps:</legend>
+						</div>
+						<p class="font-bold text-green-500 text-xl text-end">{{exercise.reps}}</p>
+					</div>
+					<input v-model.number="exercise.reps" type="range" min="1" max="20" class="range w-full" step="1" />
+					<div class="w-full flex flex-row justify-between">
+						<p class="text-start opacity-60">1</p>
+						<p class="text-end opacity-60">20</p>
+					</div>
+				</fieldset>
 
-				<!--DOWN-->
-				<button v-if="exercise.order != total - 1" class="btn btn-square" @click.stop="moveDown">
-					<i class="bi bi-arrow-down text-xl"></i>
-				</button>
+				<!--RIR-->
+				<fieldset class="fieldset w-full">
+
+					<div class="flex flex-row items-center justify-between w-full">
+						<div class="flex flex-row items-center">
+							<div
+								class="bg-orange-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
+								<i class="bi bi-bag text-orange-500 text-sm"></i>
+							</div>
+							<legend class="fieldset-legend text-left">RIR:</legend>
+						</div>
+						<p class="font-bold text-orange-500 text-xl text-end">{{exercise.rir}}</p>
+					</div>
+					<input v-model.number="exercise.rir" type="range" min="0" max="4" class="range w-full" step="1" />
+					<div class="w-full flex flex-row justify-between">
+						<p class="text-start opacity-60">0</p>
+						<p class="text-end opacity-60">4</p>
+					</div>
+				</fieldset>
+
 			</div>
-			<!--DELETE-->
-			<button class="btn btn-square btn-error" @click.stop="promptRemove">
-				<i class="bi bi-trash text-xl"></i>
-			</button>
+			<div class="flex flex-col justify-between">
+				<button class="btn btn-circle btn-ghost" @click.stop="promptRemove">
+					<i class="bi bi-trash text-lg text-error"></i>
+				</button>
+				<div class="flex flex-col gap-4">
+					<!--UP-->
+					<button v-if="exercise.order != 0" class="btn btn-circle btn-ghost" @click.stop="moveUp">
+						<i class="bi bi-arrow-up text-lg"></i>
+					</button>
 
+					<!--DOWN-->
+					<button v-if="exercise.order != total - 1" class="btn btn-circle btn-ghost" @click.stop="moveDown">
+						<i class="bi bi-arrow-down text-lg"></i>
+					</button>
+				</div>
+			</div>
 		</div>
 		<ConfirmationModal ref="confirmModal" promptText="Are you sure?"
 			:detailText="`Are you sure that you want to delete ${exercise.name}?`" confirmText="Yes"

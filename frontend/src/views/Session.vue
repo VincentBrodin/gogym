@@ -21,76 +21,94 @@
 	</div>
 
 	<template v-else>
-		<div class="p-8">
-			<h1 class="text-center text-3xl font-bold mb-4">
-				{{ session.workout.name }}
-			</h1>
-			<select class="select w-full font-semibold text-xl mb-4 text-center" @change="switchExercise"
-				ref="selectRef">
-				<option v-for="item, i in session.exercise_sessions" :key="item.exercise.id" :selected="item.active"
-					:value="i">
-					{{item.exercise.name}}</option>
-			</select>
-
-
-
-
-			<transition name="slide-fade" mode="out-in">
-				<p class="text-center text-xl mb-2 opacity-60" :key="currentExercise.sets_done">
-					{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }} x
-					{{currentExercise.exercise.reps}}
-				</p>
-			</transition>
-
-			<transition name="slide-fade" mode="out-in">
-				<p class="text-center text-xl mb-12 opacity-60" :key="currentExercise.exercise.rir">
-					{{ currentExercise.exercise.rir }} RIR
-				</p>
-			</transition>
-
-			<div class="px-16 mb-4">
-				<progress class="progress w-full" :value="progress" max="100"></progress>
+		<div class="p-4 flex flex-col gap-4 pb-30">
+			<div class="card card-border bg-gradient-to-br from-blue-500/5 to-indigo-500/5 w-full shadow-xl">
+				<div class="card-body">
+					<p class="text-lg font-bold"><i class="bi bi-bullseye text-blue-300"></i> Current Exercise</p>
+					<select class="select w-full font-semibold text-xl text-center" @change="switchExercise"
+						ref="selectRef">
+						<option v-for="item, i in session.exercise_sessions" :key="item.exercise.id"
+							:selected="item.active" :value="i">
+							{{item.exercise.name}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="card card-border bg-gradient-to-br from-emerald-500/5 to-teal-500/5 w-full shadow-xl">
+				<div class="card-body">
+					<p class="text-center text-3xl font-bold" :key="currentExercise.sets_done">
+						{{ currentExercise.sets_done }} / {{ currentExercise.exercise.sets }} x
+						{{currentExercise.exercise.reps}}
+					</p>
+					<p class="text-center text-lg font-bold text-green-600" :key="currentExercise.exercise.rir">
+						{{ currentExercise.exercise.rir }} RIR
+					</p>
+					<progress class="progress w-full" :value="progress" max="100"></progress>
+				</div>
+			</div>
+			<div class="card card-border bg-gradient-to-br from-blue-500/5 to-indigo-500/5 w-full shadow-xl">
+				<div class="card-body">
+					<p class="text-lg font-bold text-center"><i class="bi bi-clock text-blue-600"></i> Session Time</p>
+					<p class="text-center text-3xl font-bold text-blue-600">
+						{{ currentTime }}
+					</p>
+				</div>
+			</div>
+			<div class="card card-border bg-gradient-to-br from-purple-500/5 to-pink-500/5 w-full shadow-xl">
+				<div class="card-body">
+					<p class="text-lg font-bold text-center"><i class="bi bi-pause-fill text-purple-600"></i> Rest Time
+					</p>
+					<p class="text-center text-3xl font-bold text-purple-600">
+						{{ timeoutTime }}
+					</p>
+					<div class="w-full flex flex-row justify-evenly">
+						<button class="btn text-purple-600 btn-outline" @click="updateTimeout(30)">
+							+ 30s
+						</button>
+						<button class="btn text-purple-600 btn-outline" @click="updateTimeout(60)">
+							+ 1m
+						</button>
+						<button class="btn text-purple-600 btn-outline" @click="updateTimeout(120)">
+							+ 2m
+						</button>
+						<button class="btn text-purple-600 btn-outline" @click="updateTimeout(180)">
+							+ 3m
+						</button>
+					</div>
+				</div>
 			</div>
 
-			<p class="text-center text-5xl font-extrabold mb-4">
-				{{ currentTime }}
-			</p>
-			<p class="text-center text-4xl text font-extrabold mb-4">
-				{{ timeoutTime }}
-			</p>
-			<div class="w-full mb-12 join flex flex-row justify-center">
-				<button class="btn join-item grow" @click="updateTimeout(30)">
-					+ 30 sec
-				</button>
-				<button class="btn join-item grow" @click="updateTimeout(60)">
-					+ 1 min
-				</button>
-				<button class="btn join-item grow" @click="updateTimeout(120)">
-					+ 2 min
-				</button>
-				<button class="btn join-item grow" @click="updateTimeout(180)">
-					+ 3 min
-				</button>
-			</div>
-
-			<p class="text-center text-3xl font-extrabold mb-4">
-				{{ currentExercise.exercise_weights[currentExercise.sets_done - 1].weight }} KG
-			</p>
-			<div class="w-full flex flex-row  justify-center mb-4 join">
-				<button v-for="weight in weights" :key="`primary-${weight}`" class="btn btn-success join-item grow"
-					@click="updateWeight(weight)">
-					+{{ weight }}
-				</button>
-			</div>
-			<div class="w-full flex flex-row mb-4 justify-center join">
-				<button v-for="weight in weights" :key="`error-${weight}`" class="btn btn-error join-item grow"
-					@click="updateWeight(-weight)">
-					-{{ weight }}
-				</button>
+			<div class="card card-border bg-gradient-to-br from-orange-500/5 to-red-500/5 w-full shadow-xl">
+				<div class="card-body">
+					<div class="flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg"
+							width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="lucide lucide-weight h-6 w-6 text-orange-600">
+							<circle cx="12" cy="5" r="3"></circle>
+							<path
+								d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z">
+							</path>
+						</svg>
+						<div class="text-center">
+							<div class="text-4xl font-bold text-gray-900">
+								{{currentExercise.exercise_weights[currentExercise.sets_done - 1].weight}}</div>
+							<div class="text-lg text-orange-600 font-semibold">KG</div>
+						</div>
+					</div>
+					<div class="w-full grid grid-cols-3 align-middle gap-4">
+						<button v-for="weight in weights" :key="`primary-${weight}`"
+							class="btn text-success btn-outline" @click="updateWeight(weight)">
+							+{{ weight }}
+						</button>
+					</div>
+					<div class="w-full grid grid-cols-3 align-middle gap-4">
+						<button v-for="weight in weights" :key="`error-${weight}`" class="btn text-error btn-outline"
+							@click="updateWeight(-weight)">
+							-{{ weight }}
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
-
-
 		<SessionDock @next="next" @skip="skip" />
 	</template>
 </template>

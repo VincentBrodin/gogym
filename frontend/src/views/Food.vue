@@ -3,8 +3,8 @@
 		<div class="mb-4">
 			<h1 class="text-left text-2xl font-bold">Food</h1>
 		</div>
-		<div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-			<div class="flex flex-row p-4 bg-green-50 rounded-2xl border border-green-200 gap-2 shadow-md">
+		<div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+			<div class="flex flex-row p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-2xl border border-green-200 gap-2 shadow-md">
 				<div
 					class="bg-green-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
 					<i class="bi bi-bullseye text-green-500 text-2xl"></i>
@@ -14,7 +14,7 @@
 					<p class="text-2xl font-bold">{{foodItems.length}}</p>
 				</div>
 			</div>
-			<div class="flex flex-row p-4 bg-orange-50 rounded-2xl border border-orange-200 gap-2 shadow-md">
+			<div class="flex flex-row p-4 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-2xl border border-orange-200 gap-2 shadow-md">
 				<div
 					class="bg-orange-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
 					<i class="bi bi-graph-up-arrow text-orange-500 text-2xl"></i>
@@ -24,10 +24,10 @@
 					<p class="text-2xl font-bold">{{totalKcals.toFixed(1)}}</p>
 				</div>
 			</div>
-			<div class="flex flex-row p-4 bg-purple-50 rounded-2xl border border-purple-200 gap-2 shadow-md">
+			<div class="flex flex-row p-4 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl border border-blue-200 gap-2 shadow-md">
 				<div
-					class="bg-purple-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
-					<i class="bi bi-calculator text-purple-500 text-2xl"></i>
+					class="bg-blue-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-calculator text-blue-500 text-2xl"></i>
 				</div>
 				<div>
 					<p class="opacity-60">Avg per Item</p>
@@ -37,8 +37,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-row justify-between">
-			<h2 class="font-bold text-2xl mb-4">Food Items</h2>
+		<div class="flex flex-row justify-between items-center mb-4">
+			<h2 class="font-bold text-2xl">Food Items</h2>
 			<p class="opacity-60"><span class="font-bold">{{totalKcals}} kcal</span> total</p>
 		</div>
 		<div v-if="foodItems.length != 0" class="w-full flex flex-col gap-4 pb-40">

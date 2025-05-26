@@ -32,7 +32,8 @@
 			<div class="card card-border bg-base-100 w-full">
 				<div class="card-body">
 					<p>Calcultions:</p>
-					<p class="text-sm font-mono opacity-90">({{foodItem.kcal}} kcal ÷ {{foodItem.per}}) × {{foodItem.weight}}g = {{kcals}} kcal</p>
+					<p class="text-sm font-mono opacity-90">({{foodItem.kcal}} kcal ÷ {{foodItem.per}}g) ×
+						{{foodItem.weight}}g = {{kcals}} kcal</p>
 				</div>
 			</div>
 		</div>

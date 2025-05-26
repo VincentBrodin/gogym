@@ -8,23 +8,13 @@
 	<div v-else class="w-full h-full p-8">
 		<div class="mb-8">
 			<!--INFO-->
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend">Name</legend>
-				<input v-model="workout.name" type="text" class="input w-full" placeholder="Name" />
-			</fieldset>
-			<div class="flex row gap-4">
-				<fieldset class="fieldset w-full">
-					<legend class="fieldset-legend">Note</legend>
-					<input v-model="workout.note" type="text" class="input w-full" placeholder="Note" />
-					<p class="fieldset-label">Not required</p>
-				</fieldset>
-				<fieldset class="fieldset">
-					<legend class="fieldset-legend opacity-0">space</legend>
-					<button class="btn btn-square" @click="copy">
-						<i class="bi bi-share"></i>
-					</button>
-					<p class="fieldset-label opacity-0">space</p>
-				</fieldset>
+			<input v-model="workout.name" type="text" class="input input-ghost text-xl font-bold w-full"
+				placeholder="Workout Name" />
+			<div class="flex flex-row gap-4">
+				<input v-model="workout.note" type="text" class="input input-ghost w-full" placeholder="Note" />
+				<button class="btn btn-square" @click="copy">
+					<i class="bi bi-clipboard"></i>
+				</button>
 			</div>
 			<transition name="fade">
 				<div v-if="copied" role="alert" class="alert alert-success mt-4">
@@ -34,7 +24,7 @@
 			</transition>
 		</div>
 		<!--EXERCISE-->
-		<transition-group name="exercise" tag="div" class="w-full">
+		<transition-group name="exercise" tag="div" class="w-full flex flex-col gap-4 pb-10">
 			<ExerciseItem v-for="exercise in workout.exercises" :key="exercise.id" :exercise="exercise"
 				:total="workout.exercises.length" @move-up="moveUp" @move-down="moveDown" @remove="remove"
 				@change="triggerUpdateExercise(exercise)" />
