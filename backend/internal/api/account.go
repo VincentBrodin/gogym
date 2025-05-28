@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type UpdateForm struct {
+	Username string `form:"username"`
+	Email    string `form:"email"`
+	Imperial bool   `form:"imperial"`
+}
+
 func GetAccount(c echo.Context) error {
 	userToken := c.Get("user").(*jwt.Token)
 	claims := userToken.Claims.(*models.JwtUserClaims)
@@ -74,7 +80,7 @@ func GetToken(c echo.Context) error {
 }
 
 func EditAccount(c echo.Context) error {
-	var form RegistrationForm
+	var form UpdateForm
 	if err := c.Bind(&form); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
 	}
@@ -96,6 +102,8 @@ func EditAccount(c echo.Context) error {
 	if _, err := mail.ParseAddress(form.Email); err == nil {
 		user.Email = form.Email
 	}
+
+	user.Imperial = form.Imperial
 
 	user.UpdatedAt = time.Now().UTC()
 

@@ -91,16 +91,17 @@
 						<div class="text-center">
 							<div class="text-4xl font-bold text-gray-900">
 								{{currentExercise.exercise_weights[currentExercise.sets_done - 1].weight}}</div>
-							<div class="text-lg text-orange-600 font-semibold">KG</div>
+							<div v-if="imperial" class="text-lg text-orange-600 font-semibold">LB</div>
+							<div v-else class="text-lg text-orange-600 font-semibold">KG</div>
 						</div>
 					</div>
-					<div class="w-full grid grid-cols-3 align-middle gap-4">
+					<div class="w-full grid grid-cols-4 align-middle gap-4 mb-4">
 						<button v-for="weight in weights" :key="`primary-${weight}`"
 							class="btn text-success btn-outline" @click="updateWeight(weight)">
 							+{{ weight }}
 						</button>
 					</div>
-					<div class="w-full grid grid-cols-3 align-middle gap-4">
+					<div class="w-full grid grid-cols-4 align-middle gap-4">
 						<button v-for="weight in weights" :key="`error-${weight}`" class="btn text-error btn-outline"
 							@click="updateWeight(-weight)">
 							-{{ weight }}
@@ -116,6 +117,7 @@
 <script setup>
 	import SessionDock from "@/components/SessionDock.vue";
 	import {ref, onMounted, onUnmounted} from "vue";
+	import {jwtDecode} from 'jwt-decode';
 	import {useRouter} from "vue-router";
 	import {useLocalStorage} from '@vueuse/core'
 
@@ -124,7 +126,7 @@
 	const currentTime = ref("00:00:00");
 	const timeoutTime = ref("00:00:00");
 	const timeout = useLocalStorage("timeout", Date.now());
-	const weights = ref([2.5, 5, 10, 15, 20, 25]);
+	const weights = ref([1, 1.25, 2.5, 5, 10, 15, 20, 25]);
 
 	let timer;
 
@@ -136,6 +138,7 @@
 	const selectRef = ref(null)
 	const hasSession = useLocalStorage('session', false)
 	const currentExercise = ref(null);
+	const imperial = ref(false);
 
 	async function updateTimeout(time) {
 		const done = (timeout.value - Date.now()) <= 0
@@ -342,6 +345,20 @@
 		)}:${String(seconds).padStart(2, "0")}`;
 	}
 
+	function getImperial() {
+		const token = localStorage.getItem('token');
+		try {
+			const decoded = jwtDecode(token);
+			imperial.value = decoded.imperial;
+			if (imperial.value) {
+				weights.value = [1, 2.5, 5, 10, 25, 35, 45, 55];
+			}
+		}
+		catch {
+			console.log("Could not get imperial");
+		}
+	}
+
 	onMounted(async () => {
 		await grabSession();
 		currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
@@ -350,6 +367,7 @@
 			currentTime.value = updateTime(Date.now() - Date.parse(session.value.started_at));
 			timeoutTime.value = updateTime(timeout.value - Date.now());
 		}, 500);
+		getImperial();
 	});
 
 	onUnmounted(() => {
