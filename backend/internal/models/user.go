@@ -9,6 +9,7 @@ import (
 type JwtUserClaims struct {
 	ID       uint   `json:"id"`
 	Username string `json:"uname"`
+	Imperial bool `json:"imperial"`
 	jwt.RegisteredClaims
 }
 
@@ -18,6 +19,8 @@ type User struct {
 	Username string `gorm:"uniqueIndex"`
 	Email    string `gorm:"uniqueIndex"`
 	Password string
+
+	Imperial bool
 
 	Workouts         []Workout         `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	Exercises        []Exercise        `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`

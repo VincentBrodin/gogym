@@ -2,7 +2,8 @@
 	<Teleport to="body">
 		<div class="fixed px-8 bottom-24 w-full">
 			<button class="w-full btn btn-primary" onclick="addExercise.showModal()">
-				<i class="bi bi-plus-square-dotted text-2xl"></i>
+				<i class="bi bi-plus text-2xl"></i>
+				Add Exercise
 			</button>
 		</div>
 	</Teleport>

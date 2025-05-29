@@ -1,26 +1,60 @@
 <template>
-	<div class="w-full">
-		<button class="w-full flex flex-row justify-between bg-base-200 rounded-xl p-4 mb-4 border" @click="emitStart">
-			<div>
-				<h1 class="text-xl text-left font-semibold">{{ workout.name }}</h1>
-				<p class="text-xs text-left opacity-60">{{ workout.note }}</p>
-				<p class="text-xs text-left opacity-60">{{timeAgo}}</p>
-
+	<div class="card card-border bg-base-100 w-96 shadow-xl">
+		<div class="card-body">
+			<div class="flex justify-between">
+				<h2 class="text-2xl font-bold">{{workout.name}}</h2>
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="m-1">
+						<i class="bi bi-three-dots-vertical"></i>
+					</div>
+					<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+						<li>
+							<a @click="emitEdit">
+								<i class="bi bi-pencil"></i>
+								Edit
+							</a>
+						</li>
+						<li>
+							<a class="text-error" @click="promptRemove">
+								<i class="bi bi-trash"></i>
+								Delete
+							</a>
+						</li>
+					</ul>
+				</div>
 			</div>
-			<div class="flex flex-row items-center justify-end gap-4">
-				<button class="btn btn-square " @click.stop="emitEdit">
-					<i class="bi bi-pencil text-xl"></i>
-				</button>
-				<button class="btn btn-square btn-error" @click.stop="promptRemove">
-					<i class="bi bi-trash text-xl"></i>
+			<p>{{ workout.note }}</p>
+			<div class="flex flex-row gap-4">
+				<div class="flex flex-row items-center">
+					<div class="bg-blue-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
+						<i class="bi bi-bullseye text-blue-500 text-sm"></i>
+					</div>
+					<p class="text-sm opacity-60">{{workout.exercises.length}} exercises</p>
+				</div>
+				<div class="flex flex-row items-center">
+					<div
+						class="bg-purple-200 p-1.5 mr-2 w-5 h-5 text-center rounded-md flex justify-center items-center">
+						<i class="bi bi-clock text-purple-500 text-sm"></i>
+					</div>
+					<p v-if="workout.time == null" class="text-sm opacity-60">Loading</p>
+					<p v-else-if="workout.time == -1"class="text-sm opacity-60">No data avalible</p>
+					<p v-else class="text-sm opacity-60">{{workout.time.toFixed(0)}} min</p>
+				</div>
+			</div>
+			<p class="opacity-60">Last done:</p>
+			<p class="font-bold capitalize">{{timeAgo}}</p>
+			<p class="opacity-60">{{niceDate}}</p>
+			<div class="card-actions mt-5">
+				<button class="btn btn-primary w-full" @click="emitStart">
+					<i class="bi bi-caret-right"></i>
+					Start Workout
 				</button>
 			</div>
-		</button>
-		<ConfirmationModal ref="confirmModal" promptText="Are you sure?"
-			:detailText="`Are you sure that you want to delete ${workout.name}?`" confirmText="Yes"
-			@confirmed="emitRemove" />
-
+		</div>
 	</div>
+	<ConfirmationModal ref="confirmModal" promptText="Are you sure?"
+		:detailText="`Are you sure that you want to delete ${workout.name}?`" confirmText="Yes"
+		@confirmed="emitRemove" />
 
 </template>
 
@@ -61,5 +95,11 @@
 	const timeAgo = useTimeAgo(new Date(props.workout.last_done), {
 		updateInterval: 60000, // One min 
 		fullDateFormatter: date => date.toLocaleDateString()
+	});
+
+	const niceDate = new Date(props.workout.last_done).toLocaleDateString('en-US', {
+		weekday: 'long', // "Saturday"
+		month: 'short',  // "Jan"
+		day: 'numeric',  // "20"
 	});
 </script>

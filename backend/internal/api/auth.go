@@ -85,6 +85,7 @@ func Register(c echo.Context) error {
 	user := models.User{
 		Username:  form.Username,
 		Email:     form.Email,
+		Imperial:  false,
 		Password:  string(bytes),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -108,6 +109,7 @@ func GenerateUserToken(user models.User) (string, error) {
 	claims := &models.JwtUserClaims{
 		ID:       user.ID,
 		Username: user.Username,
+		Imperial: user.Imperial,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 		},

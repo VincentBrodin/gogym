@@ -7,6 +7,14 @@
 			<legend class="fieldset-legend">Username</legend>
 			<input v-model="username" type="text" class="input w-full" placeholder="Name" />
 		</fieldset>
+		<fieldset class="fieldset">
+			<legend class="fieldset-legend">Weight System</legend>
+			<label class="label">
+				<input type="checkbox" v-model="imperial" class="checkbox" />
+				Imperial
+			</label>
+		</fieldset>
+
 
 		<button class="btn w-full" @click="logout" :disabled="loading">Log out</button>
 		<button class="btn btn-error w-full" @click="deleteAccount" :disabled="loading">Delete account</button>
@@ -21,6 +29,7 @@
 
 	let updateTimeout = null;
 	const username = ref("");
+	const imperial = ref(false);
 	const router = useRouter();
 	const loading = ref(true);
 
@@ -65,14 +74,26 @@
 		try {
 			const decoded = jwtDecode(token);
 			username.value = decoded.uname;
-			loading.value = false;
 		}
 		catch {
 			console.log("Could not get username");
 		}
 	}
-	async function triggerUpdate(newUsername) {
+
+	function getImperial() {
+		const token = localStorage.getItem('token');
+		try {
+			const decoded = jwtDecode(token);
+			imperial.value = decoded.imperial;
+		}
+		catch {
+			console.log("Could not get imperial");
+		}
+	}
+
+	async function triggerUpdate(newUsername, newSystem) {
 		console.log(newUsername)
+		console.log(newSystem)
 		if (updateTimeout) clearTimeout(updateTimeout)
 		updateTimeout = setTimeout(async () => {
 			const token = localStorage.getItem('token');
@@ -84,7 +105,7 @@
 						"Content-Type": "application/json",
 						"Authorization": "Bearer " + token
 					},
-					body: JSON.stringify({"username": newUsername})
+					body: JSON.stringify({"username": newUsername, "imperial": newSystem})
 				});
 				if (!response.ok) {
 					throw new Error((await response.json()).error);
@@ -100,20 +121,28 @@
 	}
 
 
-	onMounted(getUsername);
+	onMounted(() => {
+		getUsername()
+		getImperial()
+		loading.value = false
+	});
+
 
 	watch(
-		() => ({
-			username: username.value,
-		}),
+		() => username.value,
 		(newValue, oldValue) => {
-			if (oldValue.username == "") {
-				return;
+			if (oldValue === "") return;
+			if (newValue !== "") {
+				triggerUpdate(newValue, imperial.value);
 			}
-			if (newValue.username !== "") {
-				triggerUpdate(newValue.username);
-			}
-		},
+		}
 	);
 
+	watch(
+		() => imperial.value,
+		(newValue) => {
+			console.log("Hello world");
+			triggerUpdate(username.value, newValue);
+		}
+	);
 </script>

@@ -1,88 +1,100 @@
 <template>
-	<!--<StreamBarcodeReader @decode="onDecode"></StreamBarcodeReader>-->
 	<div class="w-full h-full p-8">
 		<div class="mb-4">
 			<h1 class="text-left text-2xl font-bold">Food</h1>
 		</div>
-		<div>
-			<div class="flex flex-row gap-4">
-				<fieldset class="fieldset grow">
-					<legend class="fieldset-legend">kcals</legend>
-					<input v-model="kcals" type="number" min="1" class="input w-full" placeholder="kcals" />
-				</fieldset>
-				<fieldset class="fieldset grow">
-					<legend class="fieldset-legend">per grams</legend>
-					<input v-model="perWeight" type="number" min="1" class="input w-full" placeholder="per grams" />
-				</fieldset>
+		<div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+			<div class="flex flex-row p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-2xl border border-green-200 gap-2 shadow-md">
+				<div
+					class="bg-green-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-bullseye text-green-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Food Items</p>
+					<p class="text-2xl font-bold">{{foodItems.length}}</p>
+				</div>
 			</div>
+			<div class="flex flex-row p-4 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-2xl border border-orange-200 gap-2 shadow-md">
+				<div
+					class="bg-orange-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-graph-up-arrow text-orange-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Total Calories</p>
+					<p class="text-2xl font-bold">{{totalKcals.toFixed(1)}}</p>
+				</div>
+			</div>
+			<div class="flex flex-row p-4 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl border border-blue-200 gap-2 shadow-md">
+				<div
+					class="bg-blue-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
+					<i class="bi bi-calculator text-blue-500 text-2xl"></i>
+				</div>
+				<div>
+					<p class="opacity-60">Avg per Item</p>
+					<p v-if="foodItems.length != 0" class="text-2xl font-bold">
+						{{(totalKcals/foodItems.length).toFixed(1)}}</p>
+					<p v-else class="text-2xl font-bold">0.0</p>
+				</div>
+			</div>
+		</div>
+		<div class="flex flex-row justify-between items-center mb-4">
+			<h2 class="font-bold text-2xl">Food Items</h2>
+			<p class="opacity-60"><span class="font-bold">{{totalKcals}} kcal</span> total</p>
+		</div>
+		<div v-if="foodItems.length != 0" class="w-full flex flex-col gap-4 pb-40">
+			<FoodItem v-for="foodItem in foodItems" :key="foodItem.id" :foodItem="foodItem" @remove="remove" />
 
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend">Weight (g)</legend>
-				<input v-model="weight" type="number" min="1" class="input w-full" placeholder="Weight" />
-			</fieldset>
+			<div class="card card-border w-full bg-gradient-to-r from-emerald-600 to-teal-600 shadow-xl">
+				<div class="card-body">
+					<p class="text-2xl text-center text-white font-bold">
+						<i class="bi bi-calculator"></i>
+						Total Meal Calories
+					</p>
+					<p class="text-2xl text-center text-white font-bold">{{totalKcals.toFixed(1)}}</p>
+					<p class="text-sm opacity-60 text-white text-center">kcal</p>
+					<p class="text-sm opacity-60 text-white text-center">From <span
+							class="opacity-100 font-bold">{{foodItems.length}}</span> Food Items</p>
+				</div>
+			</div>
 		</div>
-		<div class="flex flex-row gap-4 w-full my-8">
-			<button class="btn" @click="promptClear">Clear</button>
-			<button class="grow btn btn-primary" @click="add">Add: {{Math.round((kcals/Math.max(perWeight, 1))*weight)}}kcals</button>
+		<div v-else>
+			<div class="card card-border w-full shadow-xl py-6">
+				<div class="card-body">
+					<p class="text-2xl text-center font-bold">
+						No food items yet
+					</p>
+					<p class="text-sm opacity-60 text-center">Add your first food item to start tracking calories</p>
+				</div>
+			</div>
 		</div>
-		<p class="text-xl">Total: {{totalKcals}}kcals</p>
 	</div>
-
-	<ConfirmationModal ref="confirmModal" promptText="Are you sure?"
-		:detailText="`Are you sure that you want to clear the calories?`" confirmText="Yes" @confirmed="clear" />
+	<AddFoodItemModal @add-food-item="addFoodItem" />
 </template>
 
 <script setup>
-	import ConfirmationModal from '@/components/ConfirmationModal.vue';
-	import {ref, onMounted} from 'vue'
-
 	import {useLocalStorage} from '@vueuse/core'
+	import {computed} from 'vue';
+	import FoodItem from '@/components/FoodItem.vue';
+	import AddFoodItemModal from '@/components/AddFoodItemModal.vue';
 
-	const progress = ref(0);
-	const back = ref(false);
-	const kcals = ref(0);
-	const perWeight = ref(100);
-	const weight = ref(0);
-	const confirmModal = ref(null);
-	const totalKcals = useLocalStorage('kcals', 0)
-	//function onDecode(value) {
-	//	console.log(value)
-	//	alert(value)
-	//}
+	const foodItems = useLocalStorage("foodItems", []);
 
-	function add() {
-		totalKcals.value += Math.round((kcals.value / perWeight.value) * weight.value);
-		kcals.value = 0;
-		weight.value = 0;
-		perWeight.value = 100;
+	function addFoodItem(foodItem) {
+		foodItems.value.push(foodItem);
 	}
 
-	function promptClear() {
-		if (confirmModal) {
-			confirmModal.value.open();
+	function remove(foodItem) {
+		const index = foodItems.value.indexOf(foodItem);
+		if (index !== -1) {
+			foodItems.value.splice(index, 1);
 		}
 	}
 
-	function clear() {
-		kcals.value = 0;
-		weight.value = 0;
-		perWeight.value = 100;
-		totalKcals.value = 0;
-	}
-
-
-	onMounted(() => {
-		setInterval(() => {
-			if (back.value) {
-				progress.value -= 1;
-			}
-			else {
-				progress.value += 1;
-			}
-
-			if (progress.value >= 100 || progress.value <= 0) {
-				back.value = !back.value;
-			}
-		}, 250)
-	});
+	const totalKcals = computed(() => {
+		let value = 0;
+		for (let foodItem of foodItems.value) {
+			value += (foodItem.kcal / foodItem.per) * foodItem.weight;
+		}
+		return value
+	})
 </script>
