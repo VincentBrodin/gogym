@@ -31,7 +31,11 @@
 					<p class="text-center opacity-60 text-sm">Reps</p>
 				</div>
 			</div>
-			<div class="card-actions flex justify-end">
+			<div class="card-actions flex flex-row gap-4">
+				<button class="btn btn-primary grow" @click.stop="emitView">
+					<i class="bi bi-eye text-lg"></i>
+					View
+				</button>
 				<button class="btn btn-circle btn-ghost" @click.stop="promptRemove">
 					<i class="bi bi-trash text-lg text-error"></i>
 				</button>
@@ -71,10 +75,14 @@
 		)}:${String(seconds).padStart(2, "0")}`;
 	}
 
-	const emits = defineEmits(['remove']);
+	const emits = defineEmits(['view', 'remove']);
 
 	const emitRemove = () => {
 		emits('remove', props.session);
+	};
+
+	const emitView = () => {
+		emits('view', props.session);
 	};
 
 	function promptRemove() {

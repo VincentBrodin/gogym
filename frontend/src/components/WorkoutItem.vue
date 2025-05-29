@@ -37,13 +37,16 @@
 						<i class="bi bi-clock text-purple-500 text-sm"></i>
 					</div>
 					<p v-if="workout.time == null" class="text-sm opacity-60">Loading</p>
-					<p v-else-if="workout.time == -1"class="text-sm opacity-60">No data avalible</p>
+					<p v-else-if="workout.time == -1" class="text-sm opacity-60">No data avalible</p>
 					<p v-else class="text-sm opacity-60">{{workout.time.toFixed(0)}} min</p>
 				</div>
 			</div>
 			<p class="opacity-60">Last done:</p>
 			<p class="font-bold capitalize">{{timeAgo}}</p>
-			<p class="opacity-60">{{niceDate}}</p>
+			<p class="opacity-60">
+				<i class="bi bi-calendar"></i>
+				{{niceDate}}
+			</p>
 			<div class="card-actions mt-5">
 				<button class="btn btn-primary w-full" @click="emitStart">
 					<i class="bi bi-caret-right"></i>

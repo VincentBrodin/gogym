@@ -207,7 +207,7 @@ func GetAllSessions(c echo.Context) error {
 
 	response := make([]models.WorkoutSessionResponse, len(workoutSessions))
 	for i, session := range workoutSessions {
-		if(session.Workout == nil) {
+		if session.Workout == nil {
 			fmt.Printf("Session has no workout %d\n", session.ID)
 			continue
 		}
@@ -215,6 +215,25 @@ func GetAllSessions(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func GetSession(c echo.Context) error {
+	sessionIDStr := c.Param("id")
+	sessionID, err := strconv.ParseUint(sessionIDStr, 10, 32)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid ID")
+	}
+
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(*models.JwtUserClaims)
+
+	db := c.Get("db").(*gorm.DB)
+	var workoutSession models.WorkoutSession
+	if err := db.Preload("Workout").Preload("ExerciseSessions").Preload("ExerciseSessions.Exercise").Preload("ExerciseSessions.ExerciseWeights").Where("id = ? AND user_id = ?", sessionID, claims.ID).First(&workoutSession).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, workoutSession.CreateResponse())
 }
 
 func GetCurrentSession(c echo.Context) error {

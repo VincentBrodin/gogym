@@ -8,6 +8,7 @@ import Settings from './views/Settings.vue';
 import Copy from './views/Copy.vue';
 import Stats from './views/Stats.vue';
 import Food from './views/Food.vue';
+import ViewSession from './views/ViewSession.vue';
 import { jwtDecode } from 'jwt-decode';
 
 const routes = [
@@ -16,10 +17,10 @@ const routes = [
 	{ path: '/', name: 'home', component: Home, meta: { requiresAuth: true } },
 	{ path: '/edit', name: 'edit', component: Edit, meta: { requiresAuth: true } },
 	{ path: '/session', name: 'session', component: Session, meta: { requiresAuth: true } },
+	{ path: '/stats/view', name: 'view', component: ViewSession, meta: { requiresAuth: true } },
 	{ path: '/settings', name: 'settings', component: Settings, meta: { requiresAuth: true } },
 	{ path: '/copy', name: 'copy', component: Copy, meta: { requiresAuth: true } },
 	{ path: '/stats', name: 'stats', component: Stats, meta: { requiresAuth: true } },
-	//{ path: '/food', name: 'food', component: Food, meta: { requiresAuth: true } },
 	{ path: '/food', name: 'food', component: Food },
 ];
 
