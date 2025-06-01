@@ -91,6 +91,8 @@
 				throw new Error((await response.json()).error);
 			}
 			session.value = await response.json();
+			console.log(session.value)
+			session.value.exercise_sessions = session.value.exercise_sessions.sort((a, b) => a.exercise.order - b.exercise.order)
 			niceDate.value = new Date(session.value.started_at).toLocaleDateString('en-US', {
 				weekday: 'long', // "Saturday"
 				month: 'short',  // "Jan"
