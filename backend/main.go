@@ -87,6 +87,7 @@ func spawnServer(config Config) *echo.Echo {
 
 	restricted.PUT("/session/:id", api.StartSession)
 	restricted.GET("/session", api.GetCurrentSession)
+	restricted.GET("/session/:id", api.GetSession)
 	restricted.GET("/sessions", api.GetAllSessions)
 	restricted.PATCH("/session/:id", api.EditSession)
 	restricted.DELETE("/session/:id", api.DeleteSession)

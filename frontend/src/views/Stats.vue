@@ -7,7 +7,8 @@
 			<h1 class="text-left text-2xl font-bold">Stats</h1>
 		</div>
 		<div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-			<div class="flex flex-row p-4 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl border border-blue-200 gap-2 shadow-md">
+			<div
+				class="flex flex-row p-4 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl border border-blue-200 gap-2 shadow-md">
 				<div
 					class="bg-blue-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
 					<i class="bi bi-bullseye text-blue-500 text-2xl"></i>
@@ -17,7 +18,8 @@
 					<p class="text-2xl font-bold">{{sessions.length}}</p>
 				</div>
 			</div>
-			<div class="flex flex-row p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-2xl border border-green-200 gap-2 shadow-md">
+			<div
+				class="flex flex-row p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-2xl border border-green-200 gap-2 shadow-md">
 				<div
 					class="bg-green-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
 					<i class="bi bi-graph-up-arrow text-green-500 text-2xl"></i>
@@ -27,7 +29,8 @@
 					<p class="text-2xl font-bold">{{(totalTime/60).toFixed(0)}} h</p>
 				</div>
 			</div>
-			<div class="flex flex-row p-4 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-2xl border border-purple-200 gap-2 shadow-md">
+			<div
+				class="flex flex-row p-4 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-2xl border border-purple-200 gap-2 shadow-md">
 				<div
 					class="bg-orange-200 p-1.5 mr-2 h-full aspect-square text-center rounded-2xl flex justify-center items-center">
 					<i class="bi bi-fire text-orange-500 text-2xl"></i>
@@ -41,13 +44,15 @@
 		<h2 class="font-bold text-2xl mb-4">Recent workouts</h2>
 		<transition-group name="session" tag="div"
 			class="w-full grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 place-items-center gap-4 pb-10">
-			<StatItem v-for="session in sessions" :key="session.id" :session="session" @remove="removeSession" />
+			<StatItem v-for="session in sessions" :key="session.id" :session="session" @remove="removeSession"
+				@view="viewSession" />
 		</transition-group>
 	</div>
 </template>
 
 <script setup>
 	import StatItem from '@/components/StatItem.vue';
+	import router from '@/router';
 	import {ref, onMounted} from 'vue';
 
 	const sessions = ref(null);
@@ -112,6 +117,13 @@
 		} finally {
 			loading.value = false;
 		}
+	}
+
+	function viewSession(session) {
+		router.push({
+			name: 'view',
+			query: {id: session.id}
+		});
 	}
 
 	function computeStats(sessions) {
