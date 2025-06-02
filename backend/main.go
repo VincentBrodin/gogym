@@ -39,15 +39,7 @@ func spawnServer(config Config) *echo.Echo {
 
 	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOriginFunc: func(origin string) (bool, error) {
-			// u, err := url.Parse(origin)
-			// if err != nil {
-			// 	return false, err
-			// }
-			// host := u.Hostname()
-			// return host == "localhost" || host == "127.0.0.1", nil
-			return true, nil
-		}, AllowHeaders: []string{"*"},
+		AllowOrigins: []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"},
 		AllowCredentials: true,
 	}))
